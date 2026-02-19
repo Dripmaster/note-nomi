@@ -13,6 +13,8 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
+브라우저에서 `http://127.0.0.1:8000` 접속 시 React 기반 간단한 프론트엔드를 확인할 수 있습니다.
+
 ## 환경변수
 - `NOTE_NOMI_DB_PATH`: SQLite 파일 경로
 - `NOTE_NOMI_HTTP_TIMEOUT_SEC`: 원문 수집 HTTP 타임아웃(초)
