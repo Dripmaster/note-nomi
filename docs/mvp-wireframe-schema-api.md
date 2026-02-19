@@ -458,3 +458,95 @@ CREATE INDEX idx_notes_search_tsv ON notes USING GIN (search_tsv);
 - [x] 검색 기능
 - [x] NotebookLM 연동용 export
 - [x] **본문 전체 저장** (DB/조회/API/Export 전부 반영)
+
+---
+
+## 6) 내용 분석(본문 파악) 설계안
+
+> 질문 주신 "내용 분석은 어떻게 할래?"에 대한 구현 중심 답변.
+
+### 6-1. 분석 파이프라인(단계별)
+
+1. **URL 정규화/중복 제거**
+   - UTM 등 추적 파라미터 제거
+   - 동일 canonical URL 중복 요청 차단
+2. **문서 수집(fetch)**
+   - `GET` + 리다이렉트 허용
+   - 타임아웃/사이즈 제한(예: 3MB)
+3. **본문 추출(extract)**
+   - Readability 계열로 main content 추출
+   - 실패 시 fallback: `article`/`main`/`p` 기반 휴리스틱
+4. **정제(cleaning)**
+   - 스크립트/광고/내비 텍스트 제거
+   - 줄바꿈/공백 정리, 언어 감지
+5. **품질 판정(QA gate)**
+   - 최소 길이(예: 500자) 미달 시 `low_content` 플래그
+   - 비정상 문서(로그인벽/에러페이지) 감지
+6. **LLM 분석(analyze)**
+   - 제목 생성, 요약(짧게/표준), 태그/해시태그, 카테고리 추천
+7. **저장/색인(index)**
+   - `content_full` 저장
+   - `search_tsv` 갱신 + 태그 관계 저장
+8. **검수 가능 상태로 전환**
+   - `done` 처리 후 사용자 수동수정 가능
+
+### 6-2. LLM 프롬프트 출력 스키마(JSON 강제)
+
+```json
+{
+  "aiTitle": "string",
+  "summaryShort": "string",
+  "summaryLong": "string",
+  "tags": ["string"],
+  "hashtags": ["#string"],
+  "category": "string",
+  "confidence": 0.0,
+  "signals": {
+    "isLowContent": false,
+    "isPaywalled": false,
+    "language": "ko"
+  }
+}
+```
+
+- 태그는 일반명사 중심(3~8개), 해시태그는 짧고 검색 친화적으로 제한
+- `confidence`가 낮으면 자동 카테고리 적용 대신 "미분류" 권장
+
+### 6-3. 실패/예외 처리 정책
+
+- `fetch_failed`: DNS/타임아웃/403/5xx
+- `extract_failed`: 본문 추출 불가
+- `analyze_failed`: 모델 응답 실패/JSON 파싱 실패
+- `partial_done`: 본문 저장 성공 + AI 분석 실패(재분석 가능)
+
+> 핵심: "수집 성공"과 "AI 분석 성공"을 분리해 장애 전파를 줄임.
+
+### 6-4. 품질 개선 루프
+
+- 사용자 수정값(제목/태그/카테고리)을 로그로 축적
+- 주기적으로 잘못된 태그/카테고리 상위 케이스 분석
+- 프롬프트/규칙 테이블 업데이트(도메인별 예외 룰)
+
+### 6-5. 운영 지표(최소)
+
+- 수집 성공률, 본문 추출 성공률, 분석 성공률
+- 평균 처리 시간(수집/추출/분석 단계별)
+- 사용자 수정률(높을수록 모델 품질 개선 필요)
+- 재시도 후 복구율
+
+### 6-6. 바로 구현 가능한 워커 의사코드
+
+```text
+for each queued item:
+  mark processing
+  html = fetch(url)
+  article = extract(html)
+  if article too short:
+     set low_content flag
+  llm_result = analyze(article)
+  save note(content_full=article, summaries, tags, category)
+  mark done
+on error:
+  mark failed with error_code
+```
+
