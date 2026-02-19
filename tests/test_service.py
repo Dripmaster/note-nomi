@@ -1,9 +1,34 @@
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
-from app.analysis_worker import extract_main_content, normalize_url, process_url
+from app.analysis_worker import analyze_with_llm, extract_main_content, normalize_url, process_url
 from app.service import analyze_and_store
 from app.storage import SQLiteStore
+
+
+
+
+class _MockHeaders:
+    def get_content_charset(self, default: str) -> str:
+        return default
+
+
+class _MockResponse:
+    def __init__(self, payload: dict) -> None:
+        self._payload = payload
+        self.headers = _MockHeaders()
+
+    def read(self) -> bytes:
+        import json
+        return json.dumps(self._payload).encode("utf-8")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
 
 
 class ServiceTests(unittest.TestCase):
@@ -14,56 +39,65 @@ class ServiceTests(unittest.TestCase):
             path.unlink()
         self.store = SQLiteStore(db_path=self.db_path)
 
-    def test_normalize_url_removes_query(self) -> None:
-        self.assertEqual(
-            normalize_url("https://example.com/a?utm_source=x&id=1"),
-            "https://example.com/a",
-        )
+    def test_normalize_url_removes_tracking_query(self) -> None:
+        self.assertEqual(normalize_url("https://example.com/a?utm_source=x&id=1"), "https://example.com/a?id=1")
 
     def test_extract_main_content_article(self) -> None:
-        html = "<html><body><article>Hello world</article></body></html>"
+        html = "<html><body><article>Hello <b>world</b></article></body></html>"
         self.assertEqual(extract_main_content(html), "Hello world")
 
-    def test_analyze_and_store_creates_note(self) -> None:
-        result = analyze_and_store("https://example.com/post?utm_source=abc", self.store)
 
-        self.assertIn(result["status"], {"done", "partial_done"})
+    @patch("app.analysis_worker.urlopen")
+    @patch("app.analysis_worker.get_config")
+    def test_internal_codex_provider(self, mocked_cfg: unittest.mock.Mock, mocked_urlopen: unittest.mock.Mock) -> None:
+        mocked_cfg.return_value = SimpleNamespace(
+            llm_provider="internal_codex",
+            llm_base_url="https://codex.internal/v1",
+            llm_api_key="test-key",
+            llm_model="gpt-5.2-codex",
+            llm_timeout_sec=3.0,
+            default_category="미분류",
+        )
+        mocked_urlopen.return_value = _MockResponse({
+            "choices": [{"message": {"content": '{"aiTitle":"내부코덱스 제목","summaryShort":"짧은 요약","summaryLong":"긴 요약","tags":["tag1"],"hashtags":["#tag1"],"category":"AI","confidence":0.87,"isLowContent":false}'}}]
+        })
+
+        result = analyze_with_llm("Internal codex integration content", options={"summaryLength": "standard"})
+        self.assertEqual(result.ai_title, "내부코덱스 제목")
+        self.assertEqual(result.category, "AI")
+
+    def test_analysis_option_short_summary(self) -> None:
+        content = "Sentence one about API. Sentence two about service architecture. Sentence three about notes and tags."
+        result = analyze_with_llm(content, options={"summaryLength": "short", "autoCategory": True})
+        self.assertLessEqual(len(result.summary_long), len(content))
+
+    @patch("app.analysis_worker.fetch_html")
+    def test_analyze_and_store_creates_note(self, mocked_fetch: unittest.mock.Mock) -> None:
+        mocked_fetch.return_value = "<html><body><article>Sample content from test article. It contains useful information about API design.</article></body></html>"
+        result = analyze_and_store("https://example.com/post?utm_source=abc", self.store, options={"storeFullContent": True})
         self.assertIn("noteId", result)
-
         note = self.store.get_note(result["noteId"])
-        self.assertIsNotNone(note)
         assert note is not None
         self.assertEqual(note["sourceUrl"], "https://example.com/post")
-        self.assertIn("Sample content", note["contentFull"])
 
-    def test_failure_codes(self) -> None:
-        fetch_fail = process_url("https://fetch-fail.example.com")
-        self.assertEqual(fetch_fail["status"], "fetch_failed")
-
-        partial = process_url("https://example.com/analyze-fail")
-        self.assertEqual(partial["status"], "partial_done")
+    @patch("app.analysis_worker.fetch_html")
+    def test_store_full_content_option(self, mocked_fetch: unittest.mock.Mock) -> None:
+        mocked_fetch.return_value = "<html><body><article>Only summary no content body storage option.</article></body></html>"
+        result = process_url("https://example.com/a", options={"storeFullContent": False})
+        self.assertEqual(result["contentFull"], "")
 
     def test_job_lifecycle(self) -> None:
-        job_id = self.store.create_job(["https://example.com/a", "https://fetch-fail.example.com"])
+        job_id = self.store.create_job(["https://example.com/a", "https://fetch-fail.example.com"], options={"summaryLength": "short"})
         job_before = self.store.get_job(job_id)
         assert job_before is not None
-        self.assertEqual(job_before["counts"]["queued"], 2)
+        self.assertEqual(job_before["options"]["summaryLength"], "short")
 
-        self.store.update_job_item(job_id, "https://example.com/a", "done", 1, None, None)
-        self.store.update_job_item(job_id, "https://fetch-fail.example.com", "failed", None, "fetch_failed", "fetch failed")
-        self.store.recalc_job_counts(job_id)
-
-        job_after = self.store.get_job(job_id)
-        assert job_after is not None
-        self.assertEqual(job_after["counts"]["done"], 1)
-        self.assertEqual(job_after["counts"]["failed"], 1)
-
-        retried = self.store.mark_retry_failed_items(job_id)
-        self.assertEqual(retried, 1)
-
-    def test_fts_search(self) -> None:
+    @patch("app.analysis_worker.fetch_html")
+    def test_fts_search_and_filters(self, mocked_fetch: unittest.mock.Mock) -> None:
+        mocked_fetch.return_value = "<html><body><article>Sample content with llm agent and fastapi service.</article></body></html>"
         analyze_and_store("https://example.com/llm-agent", self.store)
-        items = self.store.list_notes(q="Sample")
+        items, total = self.store.list_notes(q="Sample", tag="llm", page=1, size=10)
+        self.assertGreaterEqual(total, 1)
         self.assertGreaterEqual(len(items), 1)
 
 

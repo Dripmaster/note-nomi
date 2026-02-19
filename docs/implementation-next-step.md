@@ -22,5 +22,8 @@ python -m unittest tests/test_api.py
 7. 서비스/API 테스트 확장
 
 ## Notes
-- 현재 분석(fetch/extract/LLM)은 스텁 기반이므로 production adapter 교체가 필요합니다.
-- Job 처리는 현재 요청 시 즉시 처리(synchronous)이며, 추후 큐 워커로 교체 예정입니다.
+- 현재 분석은 `heuristic` 또는 `internal_codex` provider를 사용할 수 있으며, 내부 Codex(`/chat/completions` 호환) 연동을 지원합니다.
+- Job 처리는 API 요청에서 백그라운드 스레드로 분리되어 비동기로 진행됩니다. 운영 환경에서는 별도 워커/큐로 확장하는 것을 권장합니다.
+
+- 노트 목록/검색 페이지네이션 + 정렬/기간/태그 필터가 반영되었습니다.
+- 카테고리 ID 기반 수정 엔드포인트(`PATCH /categories/{id}`)를 제공합니다.

@@ -4,8 +4,8 @@ from app.analysis_worker import process_url
 from app.storage import SQLiteStore
 
 
-def analyze_and_store(url: str, store: SQLiteStore) -> dict:
-    result = process_url(url)
+def analyze_and_store(url: str, store: SQLiteStore, options: dict | None = None) -> dict:
+    result = process_url(url, options=options)
     if result.get("status") in {"done", "partial_done"}:
         note_id = store.create_note(result)
         result["noteId"] = note_id
@@ -17,6 +17,8 @@ def process_job(job_id: int, store: SQLiteStore) -> dict:
     if job is None:
         return {"error": "job_not_found"}
 
+    options = job.get("options", {})
+
     for item in job["items"]:
         if item["status"] != "queued":
             continue
@@ -25,7 +27,7 @@ def process_job(job_id: int, store: SQLiteStore) -> dict:
         store.update_job_item(job_id, source_url, "processing", None, None, None)
         store.recalc_job_counts(job_id)
 
-        result = analyze_and_store(source_url, store)
+        result = analyze_and_store(source_url, store, options=options)
         status = result.get("status", "failed")
         if status in {"done", "partial_done"}:
             store.update_job_item(job_id, source_url, "done", result.get("noteId"), None, None)
