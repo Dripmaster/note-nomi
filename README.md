@@ -15,4 +15,5 @@ uvicorn app.main:app --reload
 ## 테스트
 ```bash
 python -m unittest tests/test_service.py
+python -m unittest tests/test_api.py
 ```

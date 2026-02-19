@@ -25,6 +25,8 @@ def normalize_url(url: str) -> str:
 
 def fetch_html(url: str) -> str:
     # TODO: requests/httpx with timeout, redirect policy, payload size cap
+    if "fetch-fail" in url:
+        raise RuntimeError("fetch_failed")
     return f"<html><body><article>Sample content from {url}</article></body></html>"
 
 
@@ -39,6 +41,9 @@ def extract_main_content(html: str) -> str:
 
 def analyze_with_llm(content: str) -> AnalyzeResult:
     # TODO: integrate LLM provider with strict JSON schema validation
+    if "analyze-fail" in content:
+        raise RuntimeError("analyze_failed")
+
     return AnalyzeResult(
         ai_title="자동 생성 제목",
         summary_short=content[:80],
@@ -53,17 +58,34 @@ def analyze_with_llm(content: str) -> AnalyzeResult:
 
 def process_url(url: str) -> dict:
     canonical = normalize_url(url)
-    html = fetch_html(canonical)
+
+    try:
+        html = fetch_html(canonical)
+    except RuntimeError:
+        return {"status": "fetch_failed", "sourceUrl": canonical, "errorMessage": "fetch failed"}
+
     content = extract_main_content(html)
     if not content:
-        return {"status": "extract_failed", "url": canonical}
+        return {"status": "extract_failed", "sourceUrl": canonical, "errorMessage": "extract failed"}
 
-    result = analyze_with_llm(content)
-    if result.is_low_content:
-        status = "partial_done"
-    else:
-        status = "done"
+    try:
+        result = analyze_with_llm(content)
+    except RuntimeError:
+        return {
+            "status": "partial_done",
+            "sourceUrl": canonical,
+            "contentFull": content,
+            "aiTitle": "",
+            "summaryShort": "",
+            "summaryLong": "",
+            "tags": [],
+            "hashtags": [],
+            "category": "미분류",
+            "confidence": 0.0,
+            "errorMessage": "analyze failed",
+        }
 
+    status = "partial_done" if result.is_low_content else "done"
     return {
         "status": status,
         "sourceUrl": canonical,

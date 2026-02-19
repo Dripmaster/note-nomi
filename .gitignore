@@ -1,3 +1,23 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Runtime data and artifacts
 data/
+*.sqlite3
+*.db
+
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/
