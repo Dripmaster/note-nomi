@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import math
 import re
+import shlex
+import subprocess
 from collections import Counter
 from dataclasses import dataclass
 from html.parser import HTMLParser
@@ -91,7 +93,7 @@ def normalize_url(url: str) -> str:
 
 def fetch_html(url: str) -> str:
     config = get_config()
-    req = Request(url, headers={"User-Agent": "note-nomi/0.6"})
+    req = Request(url, headers={"User-Agent": "note-nomi/0.7"})
     with urlopen(req, timeout=config.http_timeout_sec) as response:
         content_type = (response.headers.get("Content-Type") or "").lower()
         if "text/html" not in content_type:
@@ -169,6 +171,45 @@ def _heuristic_analysis(content: str, options: dict | None = None) -> AnalyzeRes
     return AnalyzeResult(ai_title, summary_short, summary_long, tags, hashtags, category, round(confidence, 2), len(content) < 120)
 
 
+def _extract_json_payload(text: str) -> dict:
+    stripped = text.strip()
+    try:
+        return json.loads(stripped)
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", stripped, flags=re.DOTALL)
+        if not match:
+            raise
+        return json.loads(match.group(0))
+
+
+def _analyze_with_codex_cli(content: str, options: dict | None = None) -> AnalyzeResult:
+    cfg = get_config()
+    cmd = [cfg.codex_cli_command] + shlex.split(cfg.codex_cli_args)
+    prompt = (
+        "Return strict JSON only with keys: aiTitle, summaryShort, summaryLong, tags(array), "
+        "hashtags(array), category, confidence(0~1), isLowContent(boolean). "
+        f"Model hint: {cfg.llm_model}.\n\nContent:\n{content[:8000]}"
+    )
+
+    proc = subprocess.run(
+        cmd,
+        input=prompt,
+        text=True,
+        capture_output=True,
+        timeout=cfg.llm_timeout_sec,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"codex_cli_failed: {proc.stderr.strip()}")
+
+    obj = _extract_json_payload(proc.stdout)
+    tags = [str(t) for t in obj.get("tags", [])][:5]
+    hashtags = [str(h) for h in obj.get("hashtags", [])][:5]
+    confidence = obj.get("confidence", 0.5)
+    try:
+        confidence_val = float(confidence)
+    except (TypeError, ValueError):
+        confidence_val = 0.5
+
 def _analyze_with_internal_codex(content: str, options: dict | None = None) -> AnalyzeResult:
     cfg = get_config()
     if not cfg.llm_base_url or not cfg.llm_api_key:
@@ -206,15 +247,15 @@ def _analyze_with_internal_codex(content: str, options: dict | None = None) -> A
         tags=tags,
         hashtags=hashtags,
         category=str(obj.get("category", get_config().default_category)),
-        confidence=float(obj.get("confidence", 0.5)),
+        confidence=confidence_val,
         is_low_content=bool(obj.get("isLowContent", len(content) < 120)),
     )
 
 
 def analyze_with_llm(content: str, options: dict | None = None) -> AnalyzeResult:
     provider = get_config().llm_provider.lower()
-    if provider == "internal_codex":
-        return _analyze_with_internal_codex(content, options=options)
+    if provider == "codex_cli":
+        return _analyze_with_codex_cli(content, options=options)
     return _heuristic_analysis(content, options=options)
 
 

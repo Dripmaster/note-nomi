@@ -22,7 +22,7 @@ python -m unittest tests/test_api.py
 7. 서비스/API 테스트 확장
 
 ## Notes
-- 현재 분석은 `heuristic` 또는 `internal_codex` provider를 사용할 수 있으며, 내부 Codex(`/chat/completions` 호환) 연동을 지원합니다.
+- 현재 분석은 `heuristic` 또는 `codex_cli` provider를 사용할 수 있으며, 로컬에 설치된 Codex CLI 연동을 지원합니다.
 - Job 처리는 API 요청에서 백그라운드 스레드로 분리되어 비동기로 진행됩니다. 운영 환경에서는 별도 워커/큐로 확장하는 것을 권장합니다.
 
 - 노트 목록/검색 페이지네이션 + 정렬/기간/태그 필터가 반영되었습니다.

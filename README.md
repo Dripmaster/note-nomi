@@ -23,9 +23,9 @@ uv run uvicorn app.main:app --reload
 - `NOTE_NOMI_HTTP_MAX_BYTES`: 원문 수집 최대 바이트
 - `NOTE_NOMI_DEFAULT_CATEGORY`: 카테고리 자동분류 실패 시 기본값
 - `NOTE_NOMI_EXPORT_TTL_HOURS`: export 다운로드 URL 만료 시간
-- `NOTE_NOMI_LLM_PROVIDER`: `heuristic` 또는 `internal_codex`
-- `NOTE_NOMI_LLM_BASE_URL`: 내부 Codex 호환 API base URL
-- `NOTE_NOMI_LLM_API_KEY`: 내부 Codex API 키
+- `NOTE_NOMI_LLM_PROVIDER`: `heuristic` 또는 `codex_cli`
+- `NOTE_NOMI_CODEX_CLI_COMMAND`: 로컬 Codex CLI 실행 파일명(예: `codex`)
+- `NOTE_NOMI_CODEX_CLI_ARGS`: Codex CLI 인자(예: `run --json`)
 - `NOTE_NOMI_LLM_MODEL`: 모델명 (기본 `gpt-5.2-codex`)
 - `NOTE_NOMI_LLM_TIMEOUT_SEC`: LLM API 호출 타임아웃
 
