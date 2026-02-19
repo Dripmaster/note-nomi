@@ -1,10 +1,51 @@
-"""Simple worker skeleton for content analysis pipeline.
+from __future__ import annotations
 
-This module is intentionally lightweight and implementation-ready.
-Replace stubs (`fetch_html`, `extract_main_content`, `analyze_with_llm`) with production adapters.
-"""
-
+import json
+import math
+import re
+import shlex
+import subprocess
+from collections import Counter
 from dataclasses import dataclass
+from html.parser import HTMLParser
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from urllib.request import Request, urlopen
+
+from app.config import get_config
+
+_STOPWORDS = {
+    "the",
+    "and",
+    "for",
+    "with",
+    "that",
+    "this",
+    "from",
+    "have",
+    "about",
+    "your",
+    "you",
+    "are",
+    "was",
+    "were",
+    "있다",
+    "하다",
+    "그리고",
+    "에서",
+    "으로",
+    "대한",
+    "하는",
+    "있는",
+    "입니다",
+}
+
+_TRACKING_QUERY_KEYS = {"utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"}
+
+_CATEGORY_KEYWORDS = {
+    "개발": {"python", "api", "fastapi", "database", "sqlite", "코드", "개발", "프로그래밍", "backend", "server"},
+    "AI": {"ai", "llm", "model", "prompt", "inference", "machine", "learning", "인공지능"},
+    "생산성": {"work", "note", "workflow", "task", "productivity", "정리", "생산성", "업무"},
+}
 
 
 @dataclass
@@ -19,49 +60,180 @@ class AnalyzeResult:
     is_low_content: bool
 
 
+class _ReadableTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self._buf: list[str] = []
+        self._skip = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in {"script", "style", "noscript"}:
+            self._skip = True
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"script", "style", "noscript"}:
+            self._skip = False
+
+    def handle_data(self, data: str) -> None:
+        if not self._skip:
+            text = data.strip()
+            if text:
+                self._buf.append(text)
+
+    @property
+    def text(self) -> str:
+        return " ".join(self._buf)
+
+
 def normalize_url(url: str) -> str:
-    return url.split("?")[0]
+    parsed = urlsplit(url)
+    query_pairs = [(k, v) for k, v in parse_qsl(parsed.query, keep_blank_values=True) if k.lower() not in _TRACKING_QUERY_KEYS]
+    return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, urlencode(query_pairs), ""))
 
 
 def fetch_html(url: str) -> str:
-    # TODO: requests/httpx with timeout, redirect policy, payload size cap
-    if "fetch-fail" in url:
-        raise RuntimeError("fetch_failed")
-    return f"<html><body><article>Sample content from {url}</article></body></html>"
+    config = get_config()
+    req = Request(url, headers={"User-Agent": "note-nomi/0.7"})
+    with urlopen(req, timeout=config.http_timeout_sec) as response:
+        content_type = (response.headers.get("Content-Type") or "").lower()
+        if "text/html" not in content_type:
+            raise RuntimeError("fetch_failed")
+        raw = response.read(config.http_max_bytes + 1)
+        if len(raw) > config.http_max_bytes:
+            raise RuntimeError("fetch_failed")
+        return raw.decode(response.headers.get_content_charset("utf-8"), errors="replace")
 
 
 def extract_main_content(html: str) -> str:
-    # TODO: readability-lxml / trafilatura fallback
-    start = html.find("<article>")
-    end = html.find("</article>")
-    if start == -1 or end == -1:
+    for tag in ("article", "main", "body"):
+        match = re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", html, flags=re.IGNORECASE | re.DOTALL)
+        if not match:
+            continue
+        p = _ReadableTextParser()
+        p.feed(match.group(1))
+        t = p.text.strip()
+        if t:
+            return t
+    p = _ReadableTextParser()
+    p.feed(html)
+    return p.text.strip()
+
+
+def _sentences(text: str) -> list[str]:
+    return [chunk.strip() for chunk in re.split(r"(?<=[.!?。！？])\s+|\n+", text) if chunk.strip()]
+
+
+def _tokens(text: str) -> list[str]:
+    return re.findall(r"[\w가-힣]{2,}", text.lower())
+
+
+def _top_keywords(text: str, limit: int = 5) -> list[str]:
+    return [w for w, _ in Counter([t for t in _tokens(text) if t not in _STOPWORDS]).most_common(limit)]
+
+
+def _infer_category(text: str, enabled: bool) -> str:
+    if not enabled:
+        return get_config().default_category
+    lowered = text.lower()
+    for category, keywords in _CATEGORY_KEYWORDS.items():
+        if any(k in lowered for k in keywords):
+            return category
+    return get_config().default_category
+
+
+def _extractive_summary(text: str, sentence_count: int) -> str:
+    sents = _sentences(text)
+    if not sents:
         return ""
-    return html[start + len("<article>") : end].strip()
+    ww = Counter(_top_keywords(text, limit=20))
+    scored: list[tuple[int, float, str]] = []
+    for idx, sent in enumerate(sents):
+        toks = [tok for tok in _tokens(sent) if tok not in _STOPWORDS]
+        if toks:
+            score = sum(ww.get(tok, 0) for tok in toks) * (1 / (1 + math.log(max(10, len(toks)))))
+            scored.append((idx, score, sent))
+    if not scored:
+        return " ".join(sents[:sentence_count])
+    top = sorted(scored, key=lambda x: x[1], reverse=True)[:sentence_count]
+    return " ".join(s for _, _, s in sorted(top, key=lambda x: x[0]))
 
 
-def analyze_with_llm(content: str) -> AnalyzeResult:
-    # TODO: integrate LLM provider with strict JSON schema validation
-    if "analyze-fail" in content:
-        raise RuntimeError("analyze_failed")
+def _heuristic_analysis(content: str, options: dict | None = None) -> AnalyzeResult:
+    opts = options or {}
+    summary_len = opts.get("summaryLength", "standard")
+    summary_short = _extractive_summary(content, 1)[:180]
+    summary_long = _extractive_summary(content, 2 if summary_len == "short" else 4)[:700]
+    tags = _top_keywords(content, 4)[:3]
+    hashtags = [f"#{t}" for t in tags[:2]]
+    ai_title = " · ".join(tags[:2]) if tags else ((_sentences(content) or [content])[0][:40] or "제목 없음")
+    category = _infer_category(content, enabled=bool(opts.get("autoCategory", True)))
+    confidence = min(0.99, 0.35 + (len(set(_tokens(content))) / 120))
+    return AnalyzeResult(ai_title, summary_short, summary_long, tags, hashtags, category, round(confidence, 2), len(content) < 120)
+
+
+def _extract_json_payload(text: str) -> dict:
+    stripped = text.strip()
+    try:
+        return json.loads(stripped)
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", stripped, flags=re.DOTALL)
+        if not match:
+            raise
+        return json.loads(match.group(0))
+
+
+def _analyze_with_codex_cli(content: str, options: dict | None = None) -> AnalyzeResult:
+    cfg = get_config()
+    cmd = [cfg.codex_cli_command] + shlex.split(cfg.codex_cli_args)
+    prompt = (
+        "Return strict JSON only with keys: aiTitle, summaryShort, summaryLong, tags(array), "
+        "hashtags(array), category, confidence(0~1), isLowContent(boolean). "
+        f"Model hint: {cfg.llm_model}.\n\nContent:\n{content[:8000]}"
+    )
+
+    proc = subprocess.run(
+        cmd,
+        input=prompt,
+        text=True,
+        capture_output=True,
+        timeout=cfg.llm_timeout_sec,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"codex_cli_failed: {proc.stderr.strip()}")
+
+    obj = _extract_json_payload(proc.stdout)
+    tags = [str(t) for t in obj.get("tags", [])][:5]
+    hashtags = [str(h) for h in obj.get("hashtags", [])][:5]
+    confidence = obj.get("confidence", 0.5)
+    try:
+        confidence_val = float(confidence)
+    except (TypeError, ValueError):
+        confidence_val = 0.5
 
     return AnalyzeResult(
-        ai_title="자동 생성 제목",
-        summary_short=content[:80],
-        summary_long=content[:300],
-        tags=["요약", "노트"],
-        hashtags=["#자동분석"],
-        category="미분류",
-        confidence=0.6,
-        is_low_content=len(content) < 500,
+        ai_title=str(obj.get("aiTitle", "제목 없음")),
+        summary_short=str(obj.get("summaryShort", ""))[:180],
+        summary_long=str(obj.get("summaryLong", ""))[:700],
+        tags=tags,
+        hashtags=hashtags,
+        category=str(obj.get("category", get_config().default_category)),
+        confidence=confidence_val,
+        is_low_content=bool(obj.get("isLowContent", len(content) < 120)),
     )
 
 
-def process_url(url: str) -> dict:
-    canonical = normalize_url(url)
+def analyze_with_llm(content: str, options: dict | None = None) -> AnalyzeResult:
+    provider = get_config().llm_provider.lower()
+    if provider == "codex_cli":
+        return _analyze_with_codex_cli(content, options=options)
+    return _heuristic_analysis(content, options=options)
 
+
+def process_url(url: str, options: dict | None = None) -> dict:
+    canonical = normalize_url(url)
     try:
         html = fetch_html(canonical)
-    except RuntimeError:
+    except Exception:
         return {"status": "fetch_failed", "sourceUrl": canonical, "errorMessage": "fetch failed"}
 
     content = extract_main_content(html)
@@ -69,8 +241,8 @@ def process_url(url: str) -> dict:
         return {"status": "extract_failed", "sourceUrl": canonical, "errorMessage": "extract failed"}
 
     try:
-        result = analyze_with_llm(content)
-    except RuntimeError:
+        result = analyze_with_llm(content, options=options)
+    except Exception:
         return {
             "status": "partial_done",
             "sourceUrl": canonical,
@@ -80,16 +252,16 @@ def process_url(url: str) -> dict:
             "summaryLong": "",
             "tags": [],
             "hashtags": [],
-            "category": "미분류",
+            "category": get_config().default_category,
             "confidence": 0.0,
             "errorMessage": "analyze failed",
         }
 
-    status = "partial_done" if result.is_low_content else "done"
+    opts = options or {}
     return {
-        "status": status,
+        "status": "partial_done" if result.is_low_content else "done",
         "sourceUrl": canonical,
-        "contentFull": content,
+        "contentFull": content if opts.get("storeFullContent", True) else "",
         "aiTitle": result.ai_title,
         "summaryShort": result.summary_short,
         "summaryLong": result.summary_long,
