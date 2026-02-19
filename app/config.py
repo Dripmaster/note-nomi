@@ -14,10 +14,10 @@ class AppConfig:
     default_category: str
     export_ttl_hours: int
     llm_provider: str
-    llm_base_url: str
-    llm_api_key: str
     llm_model: str
     llm_timeout_sec: float
+    codex_cli_command: str
+    codex_cli_args: str
 
 
 def _load_dotenv(path: Path) -> None:
@@ -64,8 +64,8 @@ def get_config() -> AppConfig:
         default_category=os.getenv("NOTE_NOMI_DEFAULT_CATEGORY", "미분류"),
         export_ttl_hours=_get_int("NOTE_NOMI_EXPORT_TTL_HOURS", 1),
         llm_provider=os.getenv("NOTE_NOMI_LLM_PROVIDER", "heuristic"),
-        llm_base_url=os.getenv("NOTE_NOMI_LLM_BASE_URL", ""),
-        llm_api_key=os.getenv("NOTE_NOMI_LLM_API_KEY", ""),
         llm_model=os.getenv("NOTE_NOMI_LLM_MODEL", "gpt-5.2-codex"),
         llm_timeout_sec=_get_float("NOTE_NOMI_LLM_TIMEOUT_SEC", 20.0),
+        codex_cli_command=os.getenv("NOTE_NOMI_CODEX_CLI_COMMAND", "codex"),
+        codex_cli_args=os.getenv("NOTE_NOMI_CODEX_CLI_ARGS", ""),
     )

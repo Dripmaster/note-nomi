@@ -46,24 +46,25 @@ class ServiceTests(unittest.TestCase):
         html = "<html><body><article>Hello <b>world</b></article></body></html>"
         self.assertEqual(extract_main_content(html), "Hello world")
 
-
-    @patch("app.analysis_worker.urlopen")
+    @patch("app.analysis_worker.subprocess.run")
     @patch("app.analysis_worker.get_config")
-    def test_internal_codex_provider(self, mocked_cfg: unittest.mock.Mock, mocked_urlopen: unittest.mock.Mock) -> None:
+    def test_codex_cli_provider(self, mocked_cfg: unittest.mock.Mock, mocked_run: unittest.mock.Mock) -> None:
         mocked_cfg.return_value = SimpleNamespace(
-            llm_provider="internal_codex",
-            llm_base_url="https://codex.internal/v1",
-            llm_api_key="test-key",
-            llm_model="gpt-5.2-codex",
+            llm_provider="codex_cli",
+            codex_cli_command="codex",
+            codex_cli_args="run --json",
             llm_timeout_sec=3.0,
+            llm_model="gpt-5.2-codex",
             default_category="미분류",
         )
-        mocked_urlopen.return_value = _MockResponse({
-            "choices": [{"message": {"content": '{"aiTitle":"내부코덱스 제목","summaryShort":"짧은 요약","summaryLong":"긴 요약","tags":["tag1"],"hashtags":["#tag1"],"category":"AI","confidence":0.87,"isLowContent":false}'}}]
-        })
+        mocked_run.return_value = SimpleNamespace(
+            returncode=0,
+            stdout='{"aiTitle":"코덱스 제목","summaryShort":"짧은 요약","summaryLong":"긴 요약","tags":["tag1"],"hashtags":["#tag1"],"category":"AI","confidence":0.87,"isLowContent":false}',
+            stderr="",
+        )
 
-        result = analyze_with_llm("Internal codex integration content", options={"summaryLength": "standard"})
-        self.assertEqual(result.ai_title, "내부코덱스 제목")
+        result = analyze_with_llm("Codex CLI integration content", options={"summaryLength": "standard"})
+        self.assertEqual(result.ai_title, "코덱스 제목")
         self.assertEqual(result.category, "AI")
 
     def test_analysis_option_short_summary(self) -> None:
