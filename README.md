@@ -8,10 +8,14 @@
 
 ## 빠른 실행
 ```bash
-pip install -r requirements.txt
+uv sync
 cp .env.example .env
-uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload
 ```
+
+(기존 방식) `pip install -r requirements.txt` 후 `uvicorn app.main:app --reload`로도 실행 가능합니다.
+
+브라우저에서 `http://127.0.0.1:8000` 접속 시 React 기반 간단한 프론트엔드를 확인할 수 있습니다.
 
 ## 환경변수
 - `NOTE_NOMI_DB_PATH`: SQLite 파일 경로

@@ -1,0 +1,14 @@
+[project]
+name = "note-nomi"
+version = "0.1.0"
+description = "Lightweight AI note web project starter"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.116.1",
+  "uvicorn==0.35.0",
+  "pydantic==2.11.7",
+  "httpx==0.28.1",
+]
+
+[tool.uv]
+dev-dependencies = []
