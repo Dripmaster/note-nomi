@@ -95,6 +95,8 @@ def _snippet(note: dict, q: str, scope: str) -> str:
 @app.get("/")
 def home() -> FileResponse:
     return FileResponse("app/static/index.html")
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
