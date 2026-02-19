@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note Nomi</title>
+    <style>
+      :root { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f6f7fb; color: #1d1f2a; }
+      .container { max-width: 960px; margin: 0 auto; padding: 24px 16px 40px; }
+      .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(17, 24, 39, 0.08); padding: 16px; margin-bottom: 16px; }
+      h1, h2 { margin-top: 0; }
+      form { display: grid; gap: 12px; }
+      input, textarea, button { font: inherit; }
+      input, textarea { width: 100%; box-sizing: border-box; border: 1px solid #d4d7e3; border-radius: 8px; padding: 10px 12px; }
+      button { background: #3f5efb; color: #fff; border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .note { border: 1px solid #e6e8f2; border-radius: 10px; padding: 12px; margin-top: 10px; }
+      .muted { color: #61657a; font-size: 0.9rem; }
+      .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+      .tag { background: #eef1ff; color: #2d3c99; border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+      const { useEffect, useState } = React;
+      function App() {
+        const [urlText, setUrlText] = useState("");
+        const [notes, setNotes] = useState([]);
+        const [loading, setLoading] = useState(false);
+        const [submitting, setSubmitting] = useState(false);
+        const [message, setMessage] = useState("");
+
+        const fetchNotes = async () => {
+          setLoading(true);
+          try {
+            const response = await fetch("/api/v1/notes?page=1&size=20");
+            const data = await response.json();
+            setNotes(data.items || []);
+          } catch (error) {
+            setMessage("노트 목록을 불러오지 못했습니다.");
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        useEffect(() => {
+          fetchNotes();
+        }, []);
+
+        const onSubmit = async (event) => {
+          event.preventDefault();
+          const urls = urlText.split("\n").map((item) => item.trim()).filter(Boolean);
+          if (!urls.length) {
+            setMessage("URL을 1개 이상 입력해주세요.");
+            return;
+          }
+
+          setSubmitting(true);
+          setMessage("");
+          try {
+            const response = await fetch("/api/v1/ingestions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ urls }),
+            });
+            if (!response.ok) throw new Error();
+            const data = await response.json();
+            setMessage(`수집 요청 완료 (jobId: ${data.jobId})`);
+            setUrlText("");
+            fetchNotes();
+          } catch (error) {
+            setMessage("수집 요청에 실패했습니다.");
+          } finally {
+            setSubmitting(false);
+          }
+        };
+
+        return (
+          <div className="container">
+            <h1>Note Nomi</h1>
+            <p className="muted">React 기반 임시 UI입니다. 추후 피그마 디자인 반영 전까지 빠르게 사용할 수 있어요.</p>
+            <section className="card">
+              <h2>URL 수집 요청</h2>
+              <form onSubmit={onSubmit}>
+                <textarea rows="4" placeholder="URL을 줄바꿈으로 여러 개 입력하세요" value={urlText} onChange={(event) => setUrlText(event.target.value)} />
+                <button type="submit" disabled={submitting}>{submitting ? "요청 중..." : "수집 시작"}</button>
+              </form>
+              {message && <p className="muted">{message}</p>}
+            </section>
+            <section className="card">
+              <h2>최근 노트</h2>
+              {loading ? <p>불러오는 중...</p> : notes.length === 0 ? <p className="muted">아직 수집된 노트가 없습니다.</p> : notes.map((note) => {
+                const tags = [...(note.tags || []), ...(note.hashtags || [])];
+                return (
+                  <article className="note" key={note.id}>
+                    <h3>{note.aiTitle || "제목 없음"}</h3>
+                    <p className="muted">{note.sourceUrl}</p>
+                    <p>{note.summaryShort || "요약이 아직 없습니다."}</p>
+                    <div className="tags">
+                      {note.category?.name ? <span className="tag">#{note.category.name}</span> : null}
+                      {tags.map((tag) => <span className="tag" key={`${note.id}-${tag.type}-${tag.name}`}>#{tag.name}</span>)}
+                    </div>
+                  </article>
+                );
+              })}
+            </section>
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

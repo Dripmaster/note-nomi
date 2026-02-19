@@ -6,6 +6,7 @@ from typing import Literal
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app.config import get_config
@@ -89,6 +90,11 @@ def _snippet(note: dict, q: str, scope: str) -> str:
     return target[start:end]
 
 
+
+
+@app.get("/")
+def home() -> FileResponse:
+    return FileResponse("app/static/index.html")
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}

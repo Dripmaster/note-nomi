@@ -8,6 +8,29 @@ from app.service import analyze_and_store
 from app.storage import SQLiteStore
 
 
+
+
+class _MockHeaders:
+    def get_content_charset(self, default: str) -> str:
+        return default
+
+
+class _MockResponse:
+    def __init__(self, payload: dict) -> None:
+        self._payload = payload
+        self.headers = _MockHeaders()
+
+    def read(self) -> bytes:
+        import json
+        return json.dumps(self._payload).encode("utf-8")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+
 class ServiceTests(unittest.TestCase):
     def setUp(self) -> None:
         self.db_path = "data/test_note_nomi.db"

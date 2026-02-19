@@ -210,6 +210,36 @@ def _analyze_with_codex_cli(content: str, options: dict | None = None) -> Analyz
     except (TypeError, ValueError):
         confidence_val = 0.5
 
+def _analyze_with_internal_codex(content: str, options: dict | None = None) -> AnalyzeResult:
+    cfg = get_config()
+    if not cfg.llm_base_url or not cfg.llm_api_key:
+        raise RuntimeError("llm_config_missing")
+
+    payload = {
+        "model": cfg.llm_model,
+        "messages": [
+            {
+                "role": "system",
+                "content": "Return strict JSON with keys: aiTitle, summaryShort, summaryLong, tags(array), hashtags(array), category, confidence(0~1), isLowContent(boolean).",
+            },
+            {"role": "user", "content": content[:8000]},
+        ],
+        "temperature": 0.2,
+        "response_format": {"type": "json_object"},
+    }
+    req = Request(
+        f"{cfg.llm_base_url.rstrip('/')}/chat/completions",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {cfg.llm_api_key}"},
+        method="POST",
+    )
+    with urlopen(req, timeout=cfg.llm_timeout_sec) as resp:
+        raw = json.loads(resp.read().decode("utf-8"))
+    content_raw = raw["choices"][0]["message"]["content"]
+    obj = json.loads(content_raw)
+
+    tags = [str(t) for t in obj.get("tags", [])][:5]
+    hashtags = [str(h) for h in obj.get("hashtags", [])][:5]
     return AnalyzeResult(
         ai_title=str(obj.get("aiTitle", "제목 없음")),
         summary_short=str(obj.get("summaryShort", ""))[:180],
