@@ -4,10 +4,15 @@
 
 ## 문서
 - MVP 화면 와이어프레임 + DB 스키마 SQL + API 명세 초안: `docs/mvp-wireframe-schema-api.md`
-- FastAPI 구현 스타터 안내: `docs/implementation-next-step.md`
+- FastAPI/SQLite 구현 스타터 안내: `docs/implementation-next-step.md`
 
 ## 빠른 실행
 ```bash
 pip install -r requirements.txt
 uvicorn app.main:app --reload
+```
+
+## 테스트
+```bash
+python -m unittest tests/test_service.py
 ```
