@@ -15,10 +15,38 @@
       input, textarea { width: 100%; box-sizing: border-box; border: 1px solid #d4d7e3; border-radius: 8px; padding: 10px 12px; }
       button { background: #3f5efb; color: #fff; border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
       button:disabled { opacity: 0.6; cursor: not-allowed; }
-      .note { border: 1px solid #e6e8f2; border-radius: 10px; padding: 12px; margin-top: 10px; }
+      .note { border: 1px solid #e6e8f2; border-radius: 10px; padding: 12px; margin-top: 10px; cursor: pointer; }
+      .note:hover { border-color: #3f5efb; background: #f8f9ff; }
       .muted { color: #61657a; font-size: 0.9rem; }
       .tags { display: flex; flex-wrap: wrap; gap: 6px; }
       .tag { background: #eef1ff; color: #2d3c99; border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; }
+      .fullview { display: grid; grid-template-columns: 260px 1fr; gap: 24px; }
+      @media (max-width: 720px) { .fullview { grid-template-columns: 1fr; } }
+      .meta-panel { background: #f0f2f8; border-radius: 12px; padding: 16px; height: fit-content; }
+      .meta-panel dt { font-size: 0.75rem; color: #61657a; margin-top: 10px; margin-bottom: 2px; }
+      .meta-panel dd { margin: 0; font-size: 0.9rem; word-break: break-all; }
+      .content-panel { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(17,24,39,0.08); padding: 20px; }
+      .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid #e6e8f2; }
+      .tabs button { background: none; color: #61657a; border: 0; padding: 10px 14px; cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+      .tabs button.active { color: #3f5efb; border-bottom-color: #3f5efb; font-weight: 500; }
+      .tab-body { white-space: pre-wrap; word-break: break-word; line-height: 1.6; min-height: 120px; }
+      .back-link { display: inline-block; color: #3f5efb; text-decoration: none; margin-bottom: 16px; font-size: 0.9rem; }
+      .back-link:hover { text-decoration: underline; }
+      .btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+      button.btn-danger { background: #dc3545; }
+      button.btn-danger:hover { background: #c82333; }
+      button.btn-outline { background: #fff; color: #3f5efb; border: 1px solid #3f5efb; }
+      button.btn-outline:hover { background: #f8f9ff; }
+      .tag-filter { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 12px; }
+      .tag-filter .tag { cursor: pointer; }
+      .tag-filter .tag.active { background: #3f5efb; color: #fff; }
+      .note-actions { margin-top: 8px; display: flex; gap: 8px; }
+      .tag-edit-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+      .tag-edit-row .tag { display: inline-flex; align-items: center; gap: 4px; }
+      .tag-edit-row .tag .tag-remove { background: none; color: #61657a; padding: 0 4px; font-size: 1rem; line-height: 1; cursor: pointer; border: 0; }
+      .tag-edit-row .tag .tag-remove:hover { color: #dc3545; }
+      .tag-add-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+      .tag-add-form input { flex: 1; min-width: 100px; }
     </style>
   </head>
   <body>
@@ -28,29 +56,257 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="text/babel">
       const { useEffect, useState } = React;
+
+      function parseRoute() {
+        const hash = (window.location.hash || "#/").slice(1);
+        const parts = hash.split("/").filter(Boolean);
+        if (parts[0] === "notes" && parts[1]) {
+          const id = parseInt(parts[1], 10);
+          return { page: "note", noteId: isNaN(id) ? null : id };
+        }
+        return { page: "list", noteId: null };
+      }
+
+      function NoteFullView({ noteId, onDeleted }) {
+        const [note, setNote] = useState(null);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+        const [tab, setTab] = useState("short");
+        const [deleting, setDeleting] = useState(false);
+        const [newTagName, setNewTagName] = useState("");
+        const [newTagType, setNewTagType] = useState("tag");
+        const [tagSaving, setTagSaving] = useState(false);
+        const [editingTag, setEditingTag] = useState(null);
+        const [editTagValue, setEditTagValue] = useState("");
+        const [tagMessage, setTagMessage] = useState("");
+
+        useEffect(() => {
+          let cancelled = false;
+          setLoading(true);
+          setError(null);
+          fetch(`/api/v1/notes/${noteId}`)
+            .then((res) => {
+              if (!res.ok) throw new Error("노트를 찾을 수 없습니다.");
+              return res.json();
+            })
+            .then((data) => { if (!cancelled) setNote(data); })
+            .catch((e) => { if (!cancelled) setError(e.message); })
+            .finally(() => { if (!cancelled) setLoading(false); });
+          return () => { cancelled = true; };
+        }, [noteId]);
+
+        const buildTagsPayload = () => {
+          const tags = (note?.tags || []).map((t) => ({ name: t.name, type: "tag" }));
+          const hashtags = (note?.hashtags || []).map((h) => ({ name: h.name, type: "hashtag" }));
+          return [...tags, ...hashtags];
+        };
+
+        const patchTags = async (payload) => {
+          setTagSaving(true);
+          setTagMessage("");
+          try {
+            const res = await fetch(`/api/v1/notes/${noteId}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tags: payload }),
+            });
+            if (!res.ok) throw new Error("저장 실패");
+            const data = await res.json();
+            setNote(data);
+          } catch (e) {
+            setTagMessage(e.message || "태그 저장에 실패했습니다.");
+          } finally {
+            setTagSaving(false);
+          }
+        };
+
+        const handleRemoveTag = (type, name) => {
+          const current = buildTagsPayload().filter((t) => !(t.type === type && t.name === name));
+          patchTags(current);
+        };
+
+        const handleAddTag = () => {
+          setTagMessage("");
+          const name = (newTagName || "").trim();
+          if (!name) return;
+          const current = buildTagsPayload();
+          if (current.some((t) => t.type === newTagType && t.name === name)) {
+            setTagMessage("이미 같은 이름의 태그가 있습니다.");
+            return;
+          }
+          setNewTagName("");
+          patchTags([...current, { name, type: newTagType }]);
+        };
+
+        const handleStartEditTag = (type, name) => {
+          setEditingTag({ type, name });
+          setEditTagValue(name);
+        };
+
+        const handleSaveEditTag = () => {
+          const newName = (editTagValue || "").trim();
+          if (!newName || !editingTag) return;
+          const current = buildTagsPayload();
+          const updated = current.map((t) =>
+            t.type === editingTag.type && t.name === editingTag.name ? { ...t, name: newName } : t
+          );
+          setEditingTag(null);
+          setEditTagValue("");
+          patchTags(updated);
+        };
+
+        const handleDelete = async () => {
+          if (!window.confirm("이 메모를 삭제할까요?")) return;
+          setDeleting(true);
+          try {
+            const res = await fetch(`/api/v1/notes/${noteId}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("삭제 실패");
+            if (typeof onDeleted === "function") onDeleted();
+            window.location.hash = "#/";
+          } catch (e) {
+            setError(e.message || "삭제에 실패했습니다.");
+          } finally {
+            setDeleting(false);
+          }
+        };
+
+        if (loading) return <div className="container"><p>불러오는 중...</p></div>;
+        if (error || !note) return <div className="container"><a href="#/" className="back-link">목록으로</a><p className="muted">{error || "노트를 찾을 수 없습니다."}</p></div>;
+
+        const tabs = [
+          { id: "short", label: "요약(짧게)", text: note.summaryShort || "없음" },
+          { id: "long", label: "요약(표준)", text: note.summaryLong || "없음" },
+          { id: "full", label: "본문 전체", text: note.contentFull || "없음" },
+          { id: "memo", label: "원문 메모", text: note.errorMessage || "없음" },
+        ];
+        const activeContent = tabs.find((t) => t.id === tab)?.text ?? "";
+        const allTagItems = [...(note.tags || []).map((t) => ({ ...t, type: "tag" })), ...(note.hashtags || []).map((h) => ({ ...h, type: "hashtag" }))];
+
+        return (
+          <div className="container">
+            <div className="btn-group" style={{ marginBottom: 16 }}>
+              <a href="#/" className="back-link">목록으로</a>
+              <button type="button" className="btn-danger" disabled={deleting} onClick={handleDelete}>
+                {deleting ? "삭제 중..." : "메모 삭제"}
+              </button>
+            </div>
+            <div className="fullview">
+              <aside className="meta-panel">
+                <dl>
+                  <dt>원본 URL</dt>
+                  <dd><a href={note.sourceUrl} target="_blank" rel="noopener noreferrer">{note.sourceUrl}</a></dd>
+                  <dt>수집 시간</dt>
+                  <dd>{note.createdAt ? new Date(note.createdAt).toLocaleString("ko-KR") : "-"}</dd>
+                  <dt>카테고리</dt>
+                  <dd>{note.category?.name ?? "-"}</dd>
+                  <dt>태그 / 해시태그</dt>
+                  <dd>
+                    <div className="tag-edit-row">
+                      {allTagItems.map((t) => (
+                        <span className="tag" key={`${t.type}-${t.name}`}>
+                          {editingTag && editingTag.type === t.type && editingTag.name === t.name ? (
+                            <input
+                              type="text"
+                              value={editTagValue}
+                              onChange={(e) => setEditTagValue(e.target.value)}
+                              onBlur={handleSaveEditTag}
+                              onKeyDown={(e) => { if (e.key === "Enter") handleSaveEditTag(); if (e.key === "Escape") { setEditingTag(null); setEditTagValue(""); } }}
+                              autoFocus
+                              style={{ width: 80, padding: "2px 6px", fontSize: "0.8rem" }}
+                            />
+                          ) : (
+                            <>
+                              <span role="button" tabIndex={0} onClick={() => handleStartEditTag(t.type, t.name)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleStartEditTag(t.type, t.name); } }}>#{t.name}</span>
+                              <button type="button" className="tag-remove" aria-label="삭제" onClick={(e) => { e.stopPropagation(); handleRemoveTag(t.type, t.name); }}>×</button>
+                            </>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="tag-add-form">
+                      <input
+                        type="text"
+                        placeholder="새 태그 이름"
+                        value={newTagName}
+                        onChange={(e) => setNewTagName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddTag(); } }}
+                      />
+                      <select value={newTagType} onChange={(e) => setNewTagType(e.target.value)} style={{ padding: "6px 8px" }}>
+                        <option value="tag">태그</option>
+                        <option value="hashtag">해시태그</option>
+                      </select>
+                      <button type="button" disabled={tagSaving} onClick={handleAddTag}>{tagSaving ? "저장 중..." : "추가"}</button>
+                    </div>
+                    {tagMessage ? <p className="muted" style={{ marginTop: 4, marginBottom: 0 }}>{tagMessage}</p> : null}
+                    {allTagItems.length === 0 && !tagSaving && !tagMessage ? <span className="muted">태그를 추가하거나 클릭해서 이름을 수정할 수 있습니다.</span> : null}
+                  </dd>
+                </dl>
+              </aside>
+              <div className="content-panel">
+                <h2 style={{ marginTop: 0 }}>{note.aiTitle || "제목 없음"}</h2>
+                <div className="tabs">
+                  {tabs.map((t) => (
+                    <button key={t.id} type="button" className={tab === t.id ? "active" : ""} onClick={() => setTab(t.id)}>{t.label}</button>
+                  ))}
+                </div>
+                <div className="tab-body">{activeContent}</div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       function App() {
+        const [route, setRoute] = useState(parseRoute);
         const [urlText, setUrlText] = useState("");
         const [notes, setNotes] = useState([]);
+        const [tags, setTags] = useState([]);
+        const [selectedTag, setSelectedTag] = useState("");
         const [loading, setLoading] = useState(false);
         const [submitting, setSubmitting] = useState(false);
         const [message, setMessage] = useState("");
+        const [importKtFile, setImportKtFile] = useState(null);
+        const [importKtSubmitting, setImportKtSubmitting] = useState(false);
+        const [importKtMessage, setImportKtMessage] = useState("");
+        const [resetting, setResetting] = useState(false);
+
+        useEffect(() => {
+          const handler = () => setRoute(parseRoute());
+          window.addEventListener("hashchange", handler);
+          return () => window.removeEventListener("hashchange", handler);
+        }, []);
 
         const fetchNotes = async () => {
           setLoading(true);
           try {
-            const response = await fetch("/api/v1/notes?page=1&size=20");
+            const params = new URLSearchParams({ page: "1", size: "200" });
+            if (selectedTag) params.set("tag", selectedTag);
+            const response = await fetch("/api/v1/notes?" + params.toString());
             const data = await response.json();
             setNotes(data.items || []);
-          } catch (error) {
+          } catch (err) {
             setMessage("노트 목록을 불러오지 못했습니다.");
           } finally {
             setLoading(false);
           }
         };
 
+        const fetchTags = async () => {
+          try {
+            const response = await fetch("/api/v1/tags");
+            const data = await response.json();
+            setTags(data.items || []);
+          } catch (_) {
+            setTags([]);
+          }
+        };
+
         useEffect(() => {
-          fetchNotes();
-        }, []);
+          if (route.page === "list") {
+            fetchNotes();
+            fetchTags();
+          }
+        }, [route.page, selectedTag]);
 
         const onSubmit = async (event) => {
           event.preventDefault();
@@ -59,7 +315,6 @@
             setMessage("URL을 1개 이상 입력해주세요.");
             return;
           }
-
           setSubmitting(true);
           setMessage("");
           try {
@@ -73,17 +328,97 @@
             setMessage(`수집 요청 완료 (jobId: ${data.jobId})`);
             setUrlText("");
             fetchNotes();
-          } catch (error) {
+          } catch (err) {
             setMessage("수집 요청에 실패했습니다.");
           } finally {
             setSubmitting(false);
           }
         };
 
+        const onImportKakaotalk = async (event) => {
+          event.preventDefault();
+          if (!importKtFile) {
+            setImportKtMessage("CSV 파일을 선택해주세요.");
+            return;
+          }
+          setImportKtSubmitting(true);
+          setImportKtMessage("");
+          try {
+            const formData = new FormData();
+            formData.append("file", importKtFile);
+            const response = await fetch("/api/v1/import/kakaotalk?skip_duplicates=true", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || "가져오기 실패");
+            setImportKtMessage(`가져오기 완료: ${data.imported}건 등록, ${data.skipped}건 중복 스킵 (총 ${data.total}건)`);
+            setImportKtFile(null);
+            document.getElementById("kt-csv-input")?.reset?.();
+            fetchNotes();
+            fetchTags();
+          } catch (err) {
+            setImportKtMessage(err.message || "카카오톡 CSV 가져오기에 실패했습니다.");
+          } finally {
+            setImportKtSubmitting(false);
+          }
+        };
+
+        const onResetAll = async () => {
+          if (!window.confirm("전체 메모를 삭제합니다. 되돌릴 수 없습니다. 계속할까요?")) return;
+          setResetting(true);
+          setMessage("");
+          try {
+            const response = await fetch("/api/v1/notes?all=true", { method: "DELETE" });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || "초기화 실패");
+            setMessage(data.message || `${data.deleted}건 삭제되었습니다.`);
+            setSelectedTag("");
+            fetchNotes();
+            fetchTags();
+          } catch (err) {
+            setMessage(err.message || "초기화에 실패했습니다.");
+          } finally {
+            setResetting(false);
+          }
+        };
+
+        const onDeleteNote = async (e, noteId) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!window.confirm("이 메모를 삭제할까요?")) return;
+          try {
+            const res = await fetch(`/api/v1/notes/${noteId}`, { method: "DELETE" });
+            if (!res.ok) throw new Error();
+            fetchNotes();
+            fetchTags();
+          } catch (_) {
+            setMessage("삭제에 실패했습니다.");
+          }
+        };
+
+        if (route.page === "note" && route.noteId) {
+          return <NoteFullView noteId={route.noteId} />;
+        }
+
         return (
           <div className="container">
             <h1>Note Nomi</h1>
             <p className="muted">React 기반 임시 UI입니다. 추후 피그마 디자인 반영 전까지 빠르게 사용할 수 있어요.</p>
+            <section className="card">
+              <h2>카카오톡 나에게 보내기 가져오기</h2>
+              <form id="kt-csv-input" onSubmit={onImportKakaotalk}>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => setImportKtFile(e.target.files?.[0] ?? null)}
+                />
+                <button type="submit" disabled={importKtSubmitting}>
+                  {importKtSubmitting ? "가져오는 중..." : "CSV 메모로 등록"}
+                </button>
+              </form>
+              {importKtMessage && <p className="muted">{importKtMessage}</p>}
+            </section>
             <section className="card">
               <h2>URL 수집 요청</h2>
               <form onSubmit={onSubmit}>
@@ -93,17 +428,53 @@
               {message && <p className="muted">{message}</p>}
             </section>
             <section className="card">
-              <h2>최근 노트</h2>
-              {loading ? <p>불러오는 중...</p> : notes.length === 0 ? <p className="muted">아직 수집된 노트가 없습니다.</p> : notes.map((note) => {
-                const tags = [...(note.tags || []), ...(note.hashtags || [])];
+              <div className="btn-group" style={{ justifyContent: "space-between", marginBottom: 12 }}>
+                <h2 style={{ margin: 0 }}>최근 노트</h2>
+                <button type="button" className="btn-danger" disabled={resetting || notes.length === 0} onClick={onResetAll}>
+                  {resetting ? "초기화 중..." : "전체 초기화"}
+                </button>
+              </div>
+              <div className="tag-filter">
+                <span className="muted">태그별 보기:</span>
+                <span
+                  className={"tag" + (selectedTag === "" ? " active" : "")}
+                  onClick={() => setSelectedTag("")}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedTag(""); } }}
+                >전체</span>
+                {tags.map((t) => (
+                  <span
+                    className={"tag" + (selectedTag === t.name ? " active" : "")}
+                    key={t.name}
+                    onClick={() => setSelectedTag(t.name)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedTag(t.name); } }}
+                  >#{t.name} ({t.count})</span>
+                ))}
+                {tags.length === 0 && !loading ? <span className="muted">태그 없음</span> : null}
+              </div>
+              {loading ? <p>불러오는 중...</p> : notes.length === 0 ? <p className="muted">{selectedTag ? "해당 태그 메모가 없습니다." : "아직 수집된 노트가 없습니다."}</p> : notes.map((note) => {
+                const noteTags = [...(note.tags || []), ...(note.hashtags || [])];
                 return (
-                  <article className="note" key={note.id}>
+                  <article
+                    className="note"
+                    key={note.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => { window.location.hash = `#/notes/${note.id}`; }}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.location.hash = `#/notes/${note.id}`; } }}
+                  >
                     <h3>{note.aiTitle || "제목 없음"}</h3>
                     <p className="muted">{note.sourceUrl}</p>
                     <p>{note.summaryShort || "요약이 아직 없습니다."}</p>
                     <div className="tags">
                       {note.category?.name ? <span className="tag">#{note.category.name}</span> : null}
-                      {tags.map((tag) => <span className="tag" key={`${note.id}-${tag.type}-${tag.name}`}>#{tag.name}</span>)}
+                      {noteTags.map((tag) => <span className="tag" key={`${note.id}-${tag.type}-${tag.name}`}>#{tag.name}</span>)}
+                    </div>
+                    <div className="note-actions">
+                      <button type="button" className="btn-outline" style={{ fontSize: "0.8rem", padding: "4px 10px" }} onClick={(e) => onDeleteNote(e, note.id)}>삭제</button>
                     </div>
                   </article>
                 );

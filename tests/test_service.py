@@ -101,6 +101,46 @@ class ServiceTests(unittest.TestCase):
         self.assertGreaterEqual(total, 1)
         self.assertGreaterEqual(len(items), 1)
 
+    @patch("app.analysis_worker.fetch_html")
+    def test_instagram_fetch_failed_returns_korean_message(self, mocked_fetch: unittest.mock.Mock) -> None:
+        mocked_fetch.side_effect = RuntimeError("fetch_failed")
+        result = process_url("https://www.instagram.com/p/ABC123/")
+        self.assertEqual(result["status"], "fetch_failed")
+        self.assertIn("인스타그램", result["errorMessage"])
+        self.assertIn("oEmbed", result["errorMessage"])
+
+    @patch("app.analysis_worker.fetch_html")
+    def test_instagram_html_with_og_meta_uses_caption_as_content(self, mocked_fetch: unittest.mock.Mock) -> None:
+        # Body has no article/main text, so extract_main_content is empty; we fall back to og: meta
+        html = (
+            "<html><head>"
+            '<meta property="og:title" content="Post by user" />'
+            '<meta property="og:description" content="Caption text from Instagram post." />'
+            "</head><body><script>require('app')</script></body></html>"
+        )
+        mocked_fetch.return_value = html
+        result = process_url("https://www.instagram.com/p/xyz/")
+        self.assertIn(result["status"], ("done", "partial_done"))
+        self.assertIn("Caption text from Instagram post", result.get("contentFull", ""))
+
+    @patch("app.analysis_worker.fetch_instagram_via_browser")
+    @patch("app.analysis_worker.get_config")
+    def test_instagram_playwright_path_uses_browser_caption(
+        self, mocked_config: unittest.mock.Mock, mocked_browser: unittest.mock.Mock
+    ) -> None:
+        mocked_config.return_value = SimpleNamespace(
+            instagram_browser="playwright",
+            browser_user_data_dir=None,
+            browser_timeout_sec=25,
+            default_category="미분류",
+            llm_provider="heuristic",
+        )
+        mocked_browser.return_value = "Caption from automated browser. This is the post text."
+        result = process_url("https://www.instagram.com/p/abc123/")
+        mocked_browser.assert_called_once()
+        self.assertIn(result["status"], ("done", "partial_done"))
+        self.assertIn("Caption from automated browser", result.get("contentFull", ""))
+
 
 if __name__ == "__main__":
     unittest.main()

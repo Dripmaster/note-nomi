@@ -1,18 +1,21 @@
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime, timedelta
 from io import BytesIO
 from typing import Literal
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, File, HTTPException, Query, Response, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app.config import get_config
 from app.job_runner import JobRunner
+from app.kakaotalk_parser import parse_csv_bytes, row_to_note
 from app.storage import SQLiteStore
 
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 config = get_config()
 app = FastAPI(title="Note Nomi API", version="0.5.0")
 store = SQLiteStore(db_path=config.db_path)
@@ -158,6 +161,21 @@ def list_notes(
     return {"items": items, "total": total, "page": page, "size": size}
 
 
+@app.get("/api/v1/tags")
+def list_tags() -> dict:
+    """노트에서 사용 중인 태그/해시태그 목록 (이름, 노트 개수)."""
+    return {"items": store.list_tags()}
+
+
+@app.delete("/api/v1/notes")
+def reset_notes(all: bool = Query(False, description="true면 전체 메모 삭제(초기화)")) -> dict:
+    """전체 메모 삭제. all=true 쿼리 필수."""
+    if not all:
+        raise HTTPException(status_code=400, detail="전체 삭제 시 all=true 쿼리를 보내주세요.")
+    deleted = store.delete_all_notes()
+    return {"deleted": deleted, "message": "전체 메모가 삭제되었습니다."}
+
+
 @app.get("/api/v1/notes/{note_id}")
 def get_note(note_id: int) -> dict:
     note = store.get_note(note_id)
@@ -180,6 +198,44 @@ def delete_note(note_id: int) -> dict:
     if not deleted:
         raise HTTPException(status_code=404, detail="note_not_found")
     return {"deleted": True, "noteId": note_id}
+
+
+@app.post("/api/v1/import/kakaotalk")
+async def import_kakaotalk(
+    file: UploadFile = File(..., description="카카오톡 나에게 보내기 채팅 CSV 파일"),
+    skip_duplicates: bool = Query(True, description="동일 sourceUrl 노트가 있으면 스킵"),
+    category: str = Query("카카오톡 나에게보내기", description="등록할 메모 카테고리"),
+) -> dict:
+    """카카오톡 '나에게 보내기' CSV를 파싱해 메모(노트)로 일괄 등록."""
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="CSV 파일만 업로드할 수 있습니다.")
+    try:
+        content = await file.read()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"파일 읽기 실패: {e}") from e
+    try:
+        rows = parse_csv_bytes(content)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"CSV 파싱 실패: {e}") from e
+    if not rows:
+        return {"imported": 0, "skipped": 0, "total": 0, "noteIds": []}
+    imported = 0
+    skipped = 0
+    note_ids: list[int] = []
+    for i, row in enumerate(rows):
+        note = row_to_note(row, index=i, category=category)
+        if skip_duplicates and store.get_note_by_source_url(note["sourceUrl"]):
+            skipped += 1
+            continue
+        note_id = store.create_note(note)
+        imported += 1
+        note_ids.append(note_id)
+    return {
+        "imported": imported,
+        "skipped": skipped,
+        "total": len(rows),
+        "noteIds": note_ids,
+    }
 
 
 @app.get("/api/v1/search")

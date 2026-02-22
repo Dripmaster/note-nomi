@@ -14,6 +14,7 @@ env/
 
 # Runtime data and artifacts
 data/
+instagram_session.json
 *.sqlite3
 *.db
 

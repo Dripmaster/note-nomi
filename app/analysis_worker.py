@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import logging
 import math
+import os
 import re
 import shlex
 import subprocess
@@ -12,6 +14,8 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 from app.config import get_config
+
+logger = logging.getLogger(__name__)
 
 _STOPWORDS = {
     "the",
@@ -91,9 +95,20 @@ def normalize_url(url: str) -> str:
     return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, urlencode(query_pairs), ""))
 
 
+def _is_instagram_url(url: str) -> bool:
+    parsed = urlsplit(url)
+    netloc = (parsed.netloc or "").lower()
+    return "instagram.com" in netloc and parsed.path and parsed.path.strip("/")
+
+
 def fetch_html(url: str) -> str:
     config = get_config()
-    req = Request(url, headers={"User-Agent": "note-nomi/0.7"})
+    headers = {"User-Agent": "note-nomi/0.7"}
+    if _is_instagram_url(url):
+        headers["User-Agent"] = (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
+    req = Request(url, headers=headers)
     with urlopen(req, timeout=config.http_timeout_sec) as response:
         content_type = (response.headers.get("Content-Type") or "").lower()
         if "text/html" not in content_type:
@@ -117,6 +132,134 @@ def extract_main_content(html: str) -> str:
     p = _ReadableTextParser()
     p.feed(html)
     return p.text.strip()
+
+
+def _extract_og_meta(html: str) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for name in ("og:title", "og:description"):
+        match = re.search(
+            rf'<meta\s+property=["\']{re.escape(name)}["\']\s+content=["\']([^"\']*)["\']',
+            html,
+            re.IGNORECASE,
+        )
+        if match:
+            out[name] = match.group(1).strip()
+    return out
+
+
+def _instagram_login_and_save_session(page, config, timeout_ms: int) -> None:
+    """인스타 로그인 페이지에서 아이디/비밀번호 입력 후 로그인하고, 성공 시 세션을 저장한다."""
+    login_url = "https://www.instagram.com/accounts/login/"
+    page.goto(login_url, wait_until="domcontentloaded", timeout=timeout_ms)
+    page.wait_for_load_state("networkidle", timeout=timeout_ms)
+
+    username = (config.instagram_username or "").strip()
+    password = config.instagram_password or ""
+    if not username or not password:
+        raise RuntimeError("Instagram credentials not set")
+
+    uname_el = page.locator('input[name="username"]').first
+    uname_el.wait_for(state="visible", timeout=10000)
+    uname_el.fill(username)
+    pwd_el = page.locator('input[name="password"]').first
+    pwd_el.wait_for(state="visible", timeout=5000)
+    pwd_el.fill(password)
+    page.locator('button[type="submit"]').first.click()
+    page.wait_for_url(lambda u: "accounts/login" not in u.url, timeout=15000)
+    page.wait_for_load_state("domcontentloaded", timeout=10000)
+    if "challenge" in page.url or "checkpoint" in page.url:
+        logger.warning("Instagram: login may require checkpoint/challenge (2FA or verify). Session not saved.")
+        return
+    logger.info("Instagram: login ok, saving session")
+    path = config.instagram_session_path
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    page.context.storage_state(path=path)
+
+
+def fetch_instagram_via_browser(url: str) -> str:
+    """Playwright로 인스타그램 포스트 페이지를 열고 캡션 텍스트를 추출한다.
+    NOTE_NOMI_INSTAGRAM_BROWSER=playwright 일 때만 호출. 아이디/비밀번호가 있으면 로그인 후 세션 저장해 재사용(프로필 미사용). 없으면 프로필 경로 또는 비로그인 Chromium 사용.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError as e:
+        raise RuntimeError("playwright not installed; pip install playwright && playwright install chromium") from e
+
+    config = get_config()
+    timeout_ms = int(config.browser_timeout_sec * 1000)
+    use_credentials = bool((config.instagram_username or "").strip() and config.instagram_password)
+    user_data_dir = (config.browser_user_data_dir or "").strip() or None
+
+    if user_data_dir and not use_credentials:
+        resolved = user_data_dir
+        if not os.path.isdir(resolved):
+            parent = os.path.dirname(resolved)
+            if parent and parent != resolved and os.path.isdir(parent) and os.access(parent, os.R_OK | os.W_OK):
+                resolved = parent
+                logger.info("Instagram Playwright: using Chrome user data parent dir (use Default profile): %s", resolved)
+            else:
+                raise RuntimeError(
+                    f"NOTE_NOMI_BROWSER_USER_DATA_DIR does not exist or is not a directory: {user_data_dir}"
+                )
+        elif not os.access(resolved, os.R_OK | os.W_OK):
+            raise RuntimeError(
+                f"NOTE_NOMI_BROWSER_USER_DATA_DIR not readable/writable by current user: {resolved}"
+            )
+        user_data_dir = resolved
+    else:
+        user_data_dir = None
+
+    with sync_playwright() as p:
+        if user_data_dir:
+            context = p.chromium.launch_persistent_context(
+                user_data_dir,
+                channel="chrome",
+                headless=True,
+                timeout=timeout_ms,
+            )
+            browser = None
+        else:
+            browser = p.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled"],
+            )
+            context = browser.new_context()
+
+        try:
+            if use_credentials:
+                session_path = config.instagram_session_path
+                if browser:
+                    context.close()
+                if os.path.isfile(session_path):
+                    context = browser.new_context(storage_state=session_path)
+                    page = context.new_page()
+                    page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+                    if "accounts/login" in page.url or "challenge" in page.url or "checkpoint" in page.url:
+                        context.close()
+                        context = browser.new_context()
+                        page = context.new_page()
+                        _instagram_login_and_save_session(page, config, timeout_ms)
+                        page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+                else:
+                    context = browser.new_context()
+                    page = context.new_page()
+                    _instagram_login_and_save_session(page, config, timeout_ms)
+                    page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+            else:
+                page = context.new_page()
+                page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+
+            page.wait_for_selector("article", timeout=timeout_ms)
+            text = page.locator("article").first.inner_text(timeout=5000)
+            text = (text or "").strip()
+            if not text:
+                raise RuntimeError("fetch_failed")
+            return text
+        finally:
+            if browser:
+                browser.close()
+            else:
+                context.close()
 
 
 def _sentences(text: str) -> list[str]:
@@ -261,14 +404,53 @@ def analyze_with_llm(content: str, options: dict | None = None) -> AnalyzeResult
 
 def process_url(url: str, options: dict | None = None) -> dict:
     canonical = normalize_url(url)
-    try:
-        html = fetch_html(canonical)
-    except Exception:
-        return {"status": "fetch_failed", "sourceUrl": canonical, "errorMessage": "fetch failed"}
+    is_instagram = _is_instagram_url(canonical)
+    instagram_unavailable_msg = (
+        "인스타그램은 비로그인/비브라우저 요청을 차단합니다. "
+        "Meta 앱의 oEmbed API(액세스 토큰) 연동 또는 캡션 수동 입력을 이용해 주세요."
+    )
+    config = get_config()
+    content: str | None = None
 
-    content = extract_main_content(html)
+    if is_instagram:
+        logger.info("Instagram URL requested: %s", canonical)
+
+    if is_instagram and config.instagram_browser == "playwright":
+        try:
+            logger.info("Instagram: trying Playwright browser fetch")
+            content = fetch_instagram_via_browser(canonical)
+            logger.info("Instagram: Playwright fetch ok, content length=%d", len(content or ""))
+        except Exception as e:
+            logger.warning("Instagram: Playwright fetch failed (%s), falling back to HTTP", e)
+            content = None
+
     if not content:
-        return {"status": "extract_failed", "sourceUrl": canonical, "errorMessage": "extract failed"}
+        try:
+            html = fetch_html(canonical)
+        except Exception as e:
+            if is_instagram:
+                logger.warning("Instagram: fetch_failed for %s (%s)", canonical, e)
+            return {
+                "status": "fetch_failed",
+                "sourceUrl": canonical,
+                "errorMessage": instagram_unavailable_msg if is_instagram else "fetch failed",
+            }
+        content = extract_main_content(html)
+        if not content and is_instagram:
+            logger.info("Instagram: using HTTP + og: meta fallback")
+            meta = _extract_og_meta(html)
+            desc = meta.get("og:description", "").strip()
+            title = meta.get("og:title", "").strip()
+            if desc or title:
+                content = (title + "\n\n" + desc).strip()
+    if not content:
+        if is_instagram:
+            logger.warning("Instagram: extract_failed for %s", canonical)
+        return {
+            "status": "extract_failed",
+            "sourceUrl": canonical,
+            "errorMessage": instagram_unavailable_msg if is_instagram else "extract failed",
+        }
 
     try:
         result = analyze_with_llm(content, options=options)

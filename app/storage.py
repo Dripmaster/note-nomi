@@ -206,6 +206,8 @@ class SQLiteStore:
 
     def create_note(self, note: dict) -> int:
         now = datetime.now(UTC).isoformat()
+        created_at = note.get("createdAt") if isinstance(note.get("createdAt"), str) else now
+        updated_at = note.get("updatedAt") if isinstance(note.get("updatedAt"), str) else now
         with self._connect() as conn:
             cur = conn.execute(
                 """
@@ -225,8 +227,8 @@ class SQLiteStore:
                     json.dumps(note.get("hashtags", []), ensure_ascii=False),
                     note.get("status", "done"),
                     note.get("errorMessage"),
-                    now,
-                    now,
+                    created_at,
+                    updated_at,
                 ),
             )
             if note.get("category"):
@@ -239,6 +241,12 @@ class SQLiteStore:
                     (note["category"], now, now),
                 )
         return int(cur.lastrowid)
+
+    def get_note_by_source_url(self, source_url: str) -> dict | None:
+        """source_url로 노트 한 건 조회 (중복 체크용)."""
+        with self._connect() as conn:
+            row = conn.execute("SELECT * FROM notes WHERE source_url=?", (source_url,)).fetchone()
+        return self._row_to_note(row) if row else None
 
     def get_note(self, note_id: int) -> dict | None:
         with self._connect() as conn:
@@ -301,6 +309,28 @@ class SQLiteStore:
         with self._connect() as conn:
             cur = conn.execute("DELETE FROM notes WHERE id=?", (note_id,))
         return cur.rowcount > 0
+
+    def delete_all_notes(self) -> int:
+        """전체 노트 삭제(초기화). 삭제된 행 수 반환."""
+        with self._connect() as conn:
+            cur = conn.execute("DELETE FROM notes")
+        return cur.rowcount
+
+    def list_tags(self) -> list[dict]:
+        """노트에서 사용 중인 태그/해시태그 이름 목록 (이름, 노트 개수)."""
+        seen: dict[str, int] = {}
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT tags_json, hashtags_json FROM notes"
+            ).fetchall()
+        for row in rows:
+            for name in json.loads(row["tags_json"] or "[]"):
+                if name:
+                    seen[name] = seen.get(name, 0) + 1
+            for name in json.loads(row["hashtags_json"] or "[]"):
+                if name:
+                    seen[name] = seen.get(name, 0) + 1
+        return [{"name": name, "count": count} for name, count in sorted(seen.items(), key=lambda x: (-x[1], x[0]))]
 
     def create_job(self, urls: list[str], options: dict | None = None) -> int:
         now = datetime.now(UTC).isoformat()

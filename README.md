@@ -13,6 +13,8 @@ cp .env.example .env
 uv run uvicorn app.main:app --reload
 ```
 
+`uv`는 `.python-version`(3.13) 기준으로 실행됩니다.
+
 (기존 방식) `pip install -r requirements.txt` 후 `uvicorn app.main:app --reload`로도 실행 가능합니다.
 
 브라우저에서 `http://127.0.0.1:8000` 접속 시 React 기반 간단한 프론트엔드를 확인할 수 있습니다.
@@ -43,3 +45,5 @@ python -m unittest tests/test_api.py
 - Export는 `date_range` 대상 타입을 지원합니다.
 
 - 노트/검색 API는 페이지네이션(`page`,`size`)과 정렬/필터를 지원합니다.
+- 노트 전문보기: 목록에서 노트 클릭 시 `#/notes/{id}` 상세 페이지(메타데이터 + 요약/본문 탭)로 이동합니다.
+- 인스타그램: 인스타 URL은 브라우저 User-Agent로 재시도하며, 응답 HTML에 `og:description`/`og:title`이 있으면 캡션으로 저장합니다. 수집 실패 시 안내 메시지를 표시합니다. **Playwright 브라우저 자동화**: `uv sync --extra instagram-browser` 후 `playwright install chromium`(또는 Chrome 프로필 사용 시 `playwright install` 불필요), `.env`에 `NOTE_NOMI_INSTAGRAM_BROWSER=playwright` 및 필요 시 `NOTE_NOMI_BROWSER_USER_DATA_DIR`(Chrome 프로필 경로) 설정 시 인스타 전용 브라우저 fetch 사용. 자세한 내용은 `docs/instagram-browser-automation.md` 참고.
