@@ -43,12 +43,49 @@ _STOPWORDS = {
     "입니다",
 }
 
-_TRACKING_QUERY_KEYS = {"utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid"}
+_TRACKING_QUERY_KEYS = {
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "gclid",
+    "fbclid",
+}
 
 _CATEGORY_KEYWORDS = {
-    "개발": {"python", "api", "fastapi", "database", "sqlite", "코드", "개발", "프로그래밍", "backend", "server"},
-    "AI": {"ai", "llm", "model", "prompt", "inference", "machine", "learning", "인공지능"},
-    "생산성": {"work", "note", "workflow", "task", "productivity", "정리", "생산성", "업무"},
+    "개발": {
+        "python",
+        "api",
+        "fastapi",
+        "database",
+        "sqlite",
+        "코드",
+        "개발",
+        "프로그래밍",
+        "backend",
+        "server",
+    },
+    "AI": {
+        "ai",
+        "llm",
+        "model",
+        "prompt",
+        "inference",
+        "machine",
+        "learning",
+        "인공지능",
+    },
+    "생산성": {
+        "work",
+        "note",
+        "workflow",
+        "task",
+        "productivity",
+        "정리",
+        "생산성",
+        "업무",
+    },
 }
 
 
@@ -91,8 +128,14 @@ class _ReadableTextParser(HTMLParser):
 
 def normalize_url(url: str) -> str:
     parsed = urlsplit(url)
-    query_pairs = [(k, v) for k, v in parse_qsl(parsed.query, keep_blank_values=True) if k.lower() not in _TRACKING_QUERY_KEYS]
-    return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, urlencode(query_pairs), ""))
+    query_pairs = [
+        (k, v)
+        for k, v in parse_qsl(parsed.query, keep_blank_values=True)
+        if k.lower() not in _TRACKING_QUERY_KEYS
+    ]
+    return urlunsplit(
+        (parsed.scheme, parsed.netloc, parsed.path, urlencode(query_pairs), "")
+    )
 
 
 def _is_instagram_url(url: str) -> bool:
@@ -116,12 +159,16 @@ def fetch_html(url: str) -> str:
         raw = response.read(config.http_max_bytes + 1)
         if len(raw) > config.http_max_bytes:
             raise RuntimeError("fetch_failed")
-        return raw.decode(response.headers.get_content_charset("utf-8"), errors="replace")
+        return raw.decode(
+            response.headers.get_content_charset("utf-8"), errors="replace"
+        )
 
 
 def extract_main_content(html: str) -> str:
     for tag in ("article", "main", "body"):
-        match = re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", html, flags=re.IGNORECASE | re.DOTALL)
+        match = re.search(
+            rf"<{tag}[^>]*>(.*?)</{tag}>", html, flags=re.IGNORECASE | re.DOTALL
+        )
         if not match:
             continue
         p = _ReadableTextParser()
@@ -168,7 +215,9 @@ def _instagram_login_and_save_session(page, config, timeout_ms: int) -> None:
     page.wait_for_url(lambda u: "accounts/login" not in u.url, timeout=15000)
     page.wait_for_load_state("domcontentloaded", timeout=10000)
     if "challenge" in page.url or "checkpoint" in page.url:
-        logger.warning("Instagram: login may require checkpoint/challenge (2FA or verify). Session not saved.")
+        logger.warning(
+            "Instagram: login may require checkpoint/challenge (2FA or verify). Session not saved."
+        )
         return
     logger.info("Instagram: login ok, saving session")
     path = config.instagram_session_path
@@ -183,20 +232,32 @@ def fetch_instagram_via_browser(url: str) -> str:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError as e:
-        raise RuntimeError("playwright not installed; pip install playwright && playwright install chromium") from e
+        raise RuntimeError(
+            "playwright not installed; pip install playwright && playwright install chromium"
+        ) from e
 
     config = get_config()
     timeout_ms = int(config.browser_timeout_sec * 1000)
-    use_credentials = bool((config.instagram_username or "").strip() and config.instagram_password)
+    use_credentials = bool(
+        (config.instagram_username or "").strip() and config.instagram_password
+    )
     user_data_dir = (config.browser_user_data_dir or "").strip() or None
 
     if user_data_dir and not use_credentials:
         resolved = user_data_dir
         if not os.path.isdir(resolved):
             parent = os.path.dirname(resolved)
-            if parent and parent != resolved and os.path.isdir(parent) and os.access(parent, os.R_OK | os.W_OK):
+            if (
+                parent
+                and parent != resolved
+                and os.path.isdir(parent)
+                and os.access(parent, os.R_OK | os.W_OK)
+            ):
                 resolved = parent
-                logger.info("Instagram Playwright: using Chrome user data parent dir (use Default profile): %s", resolved)
+                logger.info(
+                    "Instagram Playwright: using Chrome user data parent dir (use Default profile): %s",
+                    resolved,
+                )
             else:
                 raise RuntimeError(
                     f"NOTE_NOMI_BROWSER_USER_DATA_DIR does not exist or is not a directory: {user_data_dir}"
@@ -234,12 +295,18 @@ def fetch_instagram_via_browser(url: str) -> str:
                     context = browser.new_context(storage_state=session_path)
                     page = context.new_page()
                     page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
-                    if "accounts/login" in page.url or "challenge" in page.url or "checkpoint" in page.url:
+                    if (
+                        "accounts/login" in page.url
+                        or "challenge" in page.url
+                        or "checkpoint" in page.url
+                    ):
                         context.close()
                         context = browser.new_context()
                         page = context.new_page()
                         _instagram_login_and_save_session(page, config, timeout_ms)
-                        page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+                        page.goto(
+                            url, wait_until="domcontentloaded", timeout=timeout_ms
+                        )
                 else:
                     context = browser.new_context()
                     page = context.new_page()
@@ -263,7 +330,11 @@ def fetch_instagram_via_browser(url: str) -> str:
 
 
 def _sentences(text: str) -> list[str]:
-    return [chunk.strip() for chunk in re.split(r"(?<=[.!?。！？])\s+|\n+", text) if chunk.strip()]
+    return [
+        chunk.strip()
+        for chunk in re.split(r"(?<=[.!?。！？])\s+|\n+", text)
+        if chunk.strip()
+    ]
 
 
 def _tokens(text: str) -> list[str]:
@@ -271,7 +342,12 @@ def _tokens(text: str) -> list[str]:
 
 
 def _top_keywords(text: str, limit: int = 5) -> list[str]:
-    return [w for w, _ in Counter([t for t in _tokens(text) if t not in _STOPWORDS]).most_common(limit)]
+    return [
+        w
+        for w, _ in Counter(
+            [t for t in _tokens(text) if t not in _STOPWORDS]
+        ).most_common(limit)
+    ]
 
 
 def _infer_category(text: str, enabled: bool) -> str:
@@ -293,7 +369,9 @@ def _extractive_summary(text: str, sentence_count: int) -> str:
     for idx, sent in enumerate(sents):
         toks = [tok for tok in _tokens(sent) if tok not in _STOPWORDS]
         if toks:
-            score = sum(ww.get(tok, 0) for tok in toks) * (1 / (1 + math.log(max(10, len(toks)))))
+            score = sum(ww.get(tok, 0) for tok in toks) * (
+                1 / (1 + math.log(max(10, len(toks))))
+            )
             scored.append((idx, score, sent))
     if not scored:
         return " ".join(sents[:sentence_count])
@@ -305,13 +383,28 @@ def _heuristic_analysis(content: str, options: dict | None = None) -> AnalyzeRes
     opts = options or {}
     summary_len = opts.get("summaryLength", "standard")
     summary_short = _extractive_summary(content, 1)[:180]
-    summary_long = _extractive_summary(content, 2 if summary_len == "short" else 4)[:700]
+    summary_long = _extractive_summary(content, 2 if summary_len == "short" else 4)[
+        :700
+    ]
     tags = _top_keywords(content, 4)[:3]
     hashtags = [f"#{t}" for t in tags[:2]]
-    ai_title = " · ".join(tags[:2]) if tags else ((_sentences(content) or [content])[0][:40] or "제목 없음")
+    ai_title = (
+        " · ".join(tags[:2])
+        if tags
+        else ((_sentences(content) or [content])[0][:40] or "제목 없음")
+    )
     category = _infer_category(content, enabled=bool(opts.get("autoCategory", True)))
     confidence = min(0.99, 0.35 + (len(set(_tokens(content))) / 120))
-    return AnalyzeResult(ai_title, summary_short, summary_long, tags, hashtags, category, round(confidence, 2), len(content) < 120)
+    return AnalyzeResult(
+        ai_title,
+        summary_short,
+        summary_long,
+        tags,
+        hashtags,
+        category,
+        round(confidence, 2),
+        len(content) < 120,
+    )
 
 
 def _extract_json_payload(text: str) -> dict:
@@ -353,7 +446,21 @@ def _analyze_with_codex_cli(content: str, options: dict | None = None) -> Analyz
     except (TypeError, ValueError):
         confidence_val = 0.5
 
-def _analyze_with_internal_codex(content: str, options: dict | None = None) -> AnalyzeResult:
+    return AnalyzeResult(
+        ai_title=str(obj.get("aiTitle", "제목 없음")),
+        summary_short=str(obj.get("summaryShort", ""))[:180],
+        summary_long=str(obj.get("summaryLong", ""))[:700],
+        tags=tags,
+        hashtags=hashtags,
+        category=str(obj.get("category", get_config().default_category)),
+        confidence=confidence_val,
+        is_low_content=bool(obj.get("isLowContent", len(content) < 120)),
+    )
+
+
+def _analyze_with_internal_codex(
+    content: str, options: dict | None = None
+) -> AnalyzeResult:
     cfg = get_config()
     if not cfg.llm_base_url or not cfg.llm_api_key:
         raise RuntimeError("llm_config_missing")
@@ -373,7 +480,10 @@ def _analyze_with_internal_codex(content: str, options: dict | None = None) -> A
     req = Request(
         f"{cfg.llm_base_url.rstrip('/')}/chat/completions",
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {cfg.llm_api_key}"},
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {cfg.llm_api_key}",
+        },
         method="POST",
     )
     with urlopen(req, timeout=cfg.llm_timeout_sec) as resp:
@@ -383,6 +493,12 @@ def _analyze_with_internal_codex(content: str, options: dict | None = None) -> A
 
     tags = [str(t) for t in obj.get("tags", [])][:5]
     hashtags = [str(h) for h in obj.get("hashtags", [])][:5]
+    confidence = obj.get("confidence", 0.5)
+    try:
+        confidence_val = float(confidence)
+    except (TypeError, ValueError):
+        confidence_val = 0.5
+
     return AnalyzeResult(
         ai_title=str(obj.get("aiTitle", "제목 없음")),
         summary_short=str(obj.get("summaryShort", ""))[:180],
@@ -419,9 +535,13 @@ def process_url(url: str, options: dict | None = None) -> dict:
         try:
             logger.info("Instagram: trying Playwright browser fetch")
             content = fetch_instagram_via_browser(canonical)
-            logger.info("Instagram: Playwright fetch ok, content length=%d", len(content or ""))
+            logger.info(
+                "Instagram: Playwright fetch ok, content length=%d", len(content or "")
+            )
         except Exception as e:
-            logger.warning("Instagram: Playwright fetch failed (%s), falling back to HTTP", e)
+            logger.warning(
+                "Instagram: Playwright fetch failed (%s), falling back to HTTP", e
+            )
             content = None
 
     if not content:
@@ -433,7 +553,9 @@ def process_url(url: str, options: dict | None = None) -> dict:
             return {
                 "status": "fetch_failed",
                 "sourceUrl": canonical,
-                "errorMessage": instagram_unavailable_msg if is_instagram else "fetch failed",
+                "errorMessage": instagram_unavailable_msg
+                if is_instagram
+                else "fetch failed",
             }
         content = extract_main_content(html)
         if not content and is_instagram:
@@ -449,7 +571,9 @@ def process_url(url: str, options: dict | None = None) -> dict:
         return {
             "status": "extract_failed",
             "sourceUrl": canonical,
-            "errorMessage": instagram_unavailable_msg if is_instagram else "extract failed",
+            "errorMessage": instagram_unavailable_msg
+            if is_instagram
+            else "extract failed",
         }
 
     try:

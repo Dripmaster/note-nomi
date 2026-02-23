@@ -7,6 +7,7 @@ from datetime import datetime
 from io import StringIO
 from pathlib import Path
 from typing import BinaryIO
+from urllib.parse import urlparse
 
 
 # 카카오톡 내보내기 CSV 컬럼: Date, User, Message
@@ -37,11 +38,13 @@ def _read_rows(reader: csv.DictReader) -> list[dict]:
         if not message:
             continue
         iso_date = parse_datetime(date_raw)
-        rows.append({
-            "date": iso_date or datetime.now().isoformat(),
-            "user": user,
-            "message": message,
-        })
+        rows.append(
+            {
+                "date": iso_date or datetime.now().isoformat(),
+                "user": user,
+                "message": message,
+            }
+        )
     return rows
 
 
@@ -66,6 +69,46 @@ def parse_csv_bytes(content: bytes | BinaryIO) -> list[dict]:
     return _read_rows(csv.DictReader(StringIO(text)))
 
 
+def _is_http_url(value: str) -> bool:
+    parsed = urlparse(value.strip())
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def parse_urls_csv_bytes(content: bytes | BinaryIO) -> list[str]:
+    if isinstance(content, bytes):
+        text = content.decode("utf-8-sig")
+    else:
+        text = content.read().decode("utf-8-sig")
+
+    candidate_headers = {"url", "sourceurl", "source_url", "link"}
+    urls: list[str] = []
+    seen: set[str] = set()
+
+    dict_reader = csv.DictReader(StringIO(text))
+    if dict_reader.fieldnames:
+        lowered = {
+            name.strip().lower(): name for name in dict_reader.fieldnames if name
+        }
+        header = next(
+            (lowered[key] for key in candidate_headers if key in lowered), None
+        )
+        if header:
+            for row in dict_reader:
+                raw = (row.get(header) or "").strip()
+                if raw and _is_http_url(raw) and raw not in seen:
+                    seen.add(raw)
+                    urls.append(raw)
+            return urls
+
+    for row in csv.reader(StringIO(text)):
+        for cell in row:
+            raw = (cell or "").strip()
+            if raw and _is_http_url(raw) and raw not in seen:
+                seen.add(raw)
+                urls.append(raw)
+    return urls
+
+
 def row_to_note(row: dict, index: int, category: str = "카카오톡 나에게보내기") -> dict:
     """
     파싱된 한 행을 note-nomi 노트 딕셔너리로 변환.
@@ -77,7 +120,9 @@ def row_to_note(row: dict, index: int, category: str = "카카오톡 나에게�
     source_url = f"kakaotalk://me/{date}_{index}"
     # 제목은 첫 줄 또는 앞 50자
     first_line = message.split("\n")[0].strip() if message else ""
-    ai_title = (first_line[:50] + "…") if len(first_line) > 50 else first_line or "(메모)"
+    ai_title = (
+        (first_line[:50] + "…") if len(first_line) > 50 else first_line or "(메모)"
+    )
     return {
         "sourceUrl": source_url,
         "aiTitle": ai_title,
