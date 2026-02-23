@@ -1,0 +1,31 @@
+F1 Oracle Audit - note-kind-views
+Timestamp: 2026-02-23T03:53:11Z
+
+VERDICT: APPROVE
+- Taxonomy and ordering match plan: KIND_ORDER = [plain_text, youtube, instagram_post, instagram_reel, threads, other_link]; compute_note_kinds returns ordered unique kinds.
+- URL extraction matches plan: regex https?://[^\s\"'<>]+, trailing trim ).,!?]}, caps at 50 URLs and 50k scanned chars (app/note_kinds.py).
+- DB persistence/backfill present: notes.primary_kind + notes.kinds_json, plus capped startup-safe backfill (max_rows=20000) behind NOTE_NOMI_BACKFILL_KINDS_ON_STARTUP (app/storage.py, app/main.py).
+- API contract matches plan: GET /api/v1/notes?kind=... validates kind (400 invalid_kind) and filters server-side via EXISTS (SELECT 1 FROM json_each(notes.kinds_json) ...) with LIKE fallback; pagination-safe total computed in SQL (app/main.py, app/storage.py).
+- Counts endpoint matches plan: GET /api/v1/note-kinds returns stable items in KIND_ORDER, computed via JOIN json_each + GROUP BY with LIKE fallback; respects the same filters as /api/v1/notes (minus pagination/sort/kind) (app/main.py, app/storage.py).
+- UI contract matches plan: kind chips drive API kind filter; badges render from API note.kinds (no JS kind reclassification; JS URL scan only used for social embeds) (app/static/index.html).
+- Commit series A/B/C/D exists with planned messages; minor deviation: kind API changes live in the same commit as extra endpoints (bdee605) rather than entirely in feat(kinds) (6b3f2c6).
+
+
+F1 Oracle Audit - note-kind-views (re-check)
+Timestamp: 2026-02-23T04:09:14Z
+Commit range inspected: cb7bf7a5e9f8ce6f7c59ea3a01f567251067611b..690197bc3f21938f112b519b197bd12439569ce4 (merge-base(origin/main,HEAD)..HEAD)
+Commits:
+- 6b3f2c6 feat(kinds): persist and filter notes by kind
+- ff2a20c feat(ui): add kind chips and social embeds
+- bdee605 feat(api): add urls-csv import and batch patch
+- 34e31ee chore: update deps and misc refactors
+- 690197b fix(api): qualify notes.id in note-kind counts filter
+
+VERDICT: APPROVE WITH NITS
+- Taxonomy + rules match plan: KIND_ORDER is [plain_text,youtube,instagram_post,instagram_reel,threads,other_link]; compute_note_kinds derives primary_kind from sourceUrl scheme and unions with extracted URL kinds with stable ordering (app/note_kinds.py:8, app/note_kinds.py:79).
+- Pagination-safe filtering is SQL-side: /api/v1/notes?kind=... validates kind and filters via SQL EXISTS (json_each(notes.kinds_json)), with SQL COUNT(*) for total (app/main.py:138, app/storage.py:194, app/storage.py:277).
+- Counts endpoint is SQL-side and q-safe: /api/v1/note-kinds uses JOIN json_each + GROUP BY and counts DISTINCT notes.id; q filter clauses use notes.id (qualified) so joining json_each does not introduce ambiguous id (app/main.py:172, app/storage.py:338, app/storage.py:211).
+- GET /api/v1/note-kinds?q=... is covered by regression test and returns stable {items:[{kind,count}],totalNotes} shape (tests/test_api.py:130).
+
+NITS
+- Commit/file grouping deviates slightly from the plan's "Commit A" expectation: app/main.py and API-level kind tests landed under bdee605 rather than 6b3f2c6 (see .sisyphus/plans/note-kind-views.md:555 vs git show --name-only bdee605). Recommended fix: none unless strict history/atomicity is required; enforce commit file lists pre-merge next time.

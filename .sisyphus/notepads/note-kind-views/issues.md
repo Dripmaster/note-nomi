@@ -1,0 +1,12 @@
+- SQLite version must be 3.38.0+ for built-in JSON functions.
+- Fixed export date_range filtering to normalize both payload bounds and note createdAt to UTC-aware datetimes; naive timestamps are treated as UTC to avoid naive/aware comparison errors in tests.
+- 2026-02-23: Risk - mixed-scope files (`app/main.py`, `app/storage.py`, `tests/test_api.py`, `tests/test_service.py`, `app/kakaotalk_parser.py`) must be hunk-split before commit or Commit A/B/C/D boundaries will blur.
+- 2026-02-23: Safety - keep `.sisyphus/` uncommitted; it is orchestration/notepad state and explicitly excluded from commit scope.
+- 2026-02-23: QA/F2 found functional break: `count_note_kinds` can raise `OperationalError: ambiguous column name: id` when `q` filter is present because `where_sql` uses unqualified `id` while query joins `notes` with `json_each`.
+- 2026-02-23: QA/F2 nit: host suffix checks in `classify_url` (`endswith("instagram.com")`/`endswith("threads.net")`) can overmatch unrelated domains; tighten to exact host or subdomain boundary.
+- 2026-02-23 F3 QA blocker: Playwright MCP could not launch browser in this environment (`Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome`), forcing fallback API-only verification for UI-intended checks.
+- 2026-02-23 F3 QA signal: `uv run python -m unittest discover -s tests` currently fails at `test_notes_kind_filter_for_youtube_and_invalid_kind` because imported note id is not guaranteed on default first page of filtered notes.
+- 2026-02-23 Fix: qualified FTS filter clauses in `_build_notes_filter` from `id IN (...)` to `notes.id IN (...)`.
+- This prevents `count_note_kinds(q=...)` from failing when `json_each(notes.kinds_json)` is joined, since `json_each` also exposes an `id` column.
+- Added API regression coverage for `GET /api/v1/note-kinds?q=watch` to assert 200 and stable `items` shape.
+- 2026-02-23 F3 rerun: Playwright MCP still blocked by missing Chrome binary (`/opt/google/chrome/chrome`); `browser_install` also failed in this environment, so QA must continue with API fallback checks.

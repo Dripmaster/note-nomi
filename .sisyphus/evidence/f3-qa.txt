@@ -1,0 +1,87 @@
+2026-02-23 F3 QA run (agent-executed)
+
+1) Required test run first
+- Command: `uv run python -m unittest discover -s tests`
+- Outcome: FAILED (failures=1)
+- Failure: `test_notes_kind_filter_for_youtube_and_invalid_kind (test_api.APITests.test_notes_kind_filter_for_youtube_and_invalid_kind)`
+- Key assertion error: imported note id `135` not found in first-page filtered ids for `GET /api/v1/notes?kind=youtube`.
+- Other notes: many inherited `ResourceWarning: unclosed database` warnings and FastAPI `on_event` deprecation warnings were emitted.
+
+2) Playwright UI QA attempt
+- Command: Start app server
+  `uv run uvicorn app.main:app --port 8000 > /tmp/note-nomi-f3-qa-server.log 2>&1 &`
+- Command: Navigate via Playwright MCP to `http://127.0.0.1:8000/`
+- Outcome: BLOCKED
+- Error: `browserType.launchPersistentContext: Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome`
+- Decision: Execute required fallback API QA.
+
+3) Test data setup for fallback QA
+- Command:
+  `uv run python - <<'PY' ... write /tmp/f3-qa-kakaotalk.csv ... PY`
+  then
+  `curl -sS -X POST "http://127.0.0.1:8000/api/v1/import/kakaotalk?skip_duplicates=false" -F "file=@/tmp/f3-qa-kakaotalk.csv;type=text/csv"`
+- CSV rows inserted:
+  - KakaoTalk-like message with YouTube URL (`https://youtu.be/dQw4w9WgXcQ`)
+  - Message with Instagram post URL (`https://www.instagram.com/p/Ct9xYk1Jabc/`)
+- Outcome: `{"imported":2,"skipped":0,"total":2,"noteIds":[136,137]}`
+
+4) Fallback API QA verification
+- Command: `curl -sS "http://127.0.0.1:8000/api/v1/notes?kind=youtube"`
+  - Outcome: `total=23`, default page `items=20`, all returned items include `"youtube"` in `kinds`.
+- Command: `curl -sS "http://127.0.0.1:8000/api/v1/notes?kind=youtube&size=200"`
+  - Outcome: `total=25`, `items=25`, includes imported note `id=136`, and all items include `"youtube"`.
+- Command: `curl -sS "http://127.0.0.1:8000/api/v1/note-kinds"`
+  - Outcome: includes `{"kind":"youtube","count":23}` and `{"kind":"instagram_post","count":1}`.
+- Command: `curl -sS "http://127.0.0.1:8000/api/v1/notes/136"`
+  - Outcome: `sourceUrl=kakaotalk://...` (non-http), `primaryKind=plain_text`, `kinds=["plain_text","youtube"]`.
+- Command: `curl -sS "http://127.0.0.1:8000/api/v1/notes/137"`
+  - Outcome: `sourceUrl=kakaotalk://...` (non-http), `primaryKind=plain_text`, `kinds=["plain_text","instagram_post"]`.
+
+5) Social embed render verification (fallback)
+- Command: `curl -sS "http://127.0.0.1:8000/"`
+- Outcome: home HTML contains `연결된 소셜 페이지`, `instagram-media`, and `threads-embed` markers.
+
+6) Cleanup
+- Command: `pkill -f "uvicorn app.main:app --port 8000"`
+- Outcome: background QA server stopped.
+
+Final QA status for F3:
+- Playwright UI click-path (chip click/detail scroll) could not be executed in this environment due to missing Chrome binary.
+- Fallback API QA passed for kind classification/filter/count behavior and social embed section markup presence.
+
+2026-02-23 F3 QA rerun (post-fix verification)
+
+1) Required test run
+- Command: `uv run python -m unittest discover -s tests`
+- Outcome: PASSED
+- Key lines: `Ran 28 tests in 3.294s`, `OK`
+- Resolution note: earlier F3 failure on youtube kind pagination is resolved after fix; suite now passes.
+
+2) Playwright UI QA attempt
+- Command: Playwright MCP `browser_navigate` to `http://127.0.0.1:8000/`
+- Outcome: BLOCKED
+- Error: `browserType.launchPersistentContext: Chromium distribution 'chrome' is not found at /opt/google/chrome/chrome`
+- Install attempt: Playwright MCP `browser_install` also failed in this environment (chrome install not available).
+
+3) Fallback API QA (required path when Playwright unavailable)
+- Local server run with isolated DB: `NOTE_NOMI_DB_PATH=/tmp/note-nomi-f3-qa.db uv run uvicorn app.main:app --host 127.0.0.1 --port 8000`
+- Imported KakaoTalk CSV with 2 rows:
+  - `watch this https://youtu.be/dQw4w9WgXcQ`
+  - `social https://www.instagram.com/p/Cu123456789/ and https://www.threads.net/@meta/post/Cu123456789`
+- Import outcome: status `200`, note ids `[1, 2]`
+- `GET /api/v1/notes?kind=youtube&size=200`: status `200`, includes imported id `1`, and all returned items include `youtube` in `kinds`.
+- `GET /api/v1/note-kinds?q=watch`: status `200`, `items` is a list and every item has stable shape `{kind,count}`.
+- `GET /api/v1/notes/1`: `primaryKind=plain_text`, `kinds=["plain_text","youtube"]`.
+- `GET /api/v1/notes/2`: `primaryKind=plain_text`, `kinds=["plain_text","instagram_post","threads"]`.
+- Union behavior check: `primaryKind` is present in each note `kinds`, and contained link kinds are preserved.
+
+4) Social embed section existence verification
+- `GET /` returns status `200` and contains `연결된 소셜 페이지`, `instagram-media`, `threads-embed`.
+
+5) Cleanup
+- Command: `pkill -f "uvicorn app.main:app --host 127.0.0.1 --port 8000"`
+- Outcome: QA server stopped.
+
+Final QA status for F3 (rerun):
+- Required test suite passes.
+- Playwright UI execution remains environment-blocked (missing Chrome), so fallback API QA was executed and passed end-to-end checks for kind filtering, kind counts/query shape, note kind union behavior, and social embed section presence.

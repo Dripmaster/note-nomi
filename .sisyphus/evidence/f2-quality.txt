@@ -1,0 +1,25 @@
+VERDICT: REJECT
+
+CRITICAL:
+- `GET /api/v1/note-kinds` fails for search-filtered requests (`q` set) due to ambiguous `id` in the `count_note_kinds` SQL query that joins `notes` with `json_each`; reproduced as `sqlite3.OperationalError: ambiguous column name: id` via `SQLiteStore.count_note_kinds(q='abc')`.
+
+NITS:
+- Host checks in `classify_url` rely on `endswith("instagram.com")` / `endswith("threads.net")`, which can misclassify unrelated domains that share those suffixes (e.g., `notinstagram.com`, `notthreads.net`); consider exact host / subdomain boundary checks.
+- `_row_to_note` opens a category lookup query per row, which introduces N+1 DB lookups during list operations; safe functionally, but may become a performance bottleneck on larger note lists.
+- Known non-blocking warnings remain from inherited context: FastAPI `on_event` deprecation and occasional sqlite `ResourceWarning` for unclosed connections.
+
+2026-02-23 F2 Re-Review (HEAD)
+VERDICT: APPROVE WITH NITS
+
+Previous REJECT status: CLEARED.
+
+Clearing rationale:
+- Confirmed ambiguous `id` regression is fixed in relevant FTS filter SQL paths by qualifying `notes.id` in `_build_notes_filter` (`app/storage.py`:225,231,236). This removes ambiguity when `count_note_kinds` joins `json_each(notes.kinds_json)`.
+- Confirmed `count_note_kinds(q=...)` has direct API regression coverage in `tests/test_api.py` (`test_note_kinds_counts_endpoint_with_q_filter`) and test suite passes (`uv run python -m unittest tests/test_api.py` => `Ran 5 tests ... OK`).
+- Confirmed API validation for kind filter returns stable error shape for invalid input (`GET /api/v1/notes?kind=not_a_kind` -> `400` with `detail="invalid_kind"`) in both implementation and tests.
+- Confirmed frontend embed viewer avoids arbitrary HTML injection: rendering is React JSX only (no `innerHTML`), URLs are parsed via `new URL`, social type is allowlisted (Instagram/Threads), and script loading is constrained to constants (`https://www.instagram.com/embed.js`, `https://www.threads.net/embed.js`).
+
+Nits (non-blocking):
+- Host suffix checks (`endswith("instagram.com")`, `endswith("threads.net")`) can overmatch lookalike domains.
+- `_row_to_note` still performs per-row category lookup (N+1 query pattern).
+- Repository has existing static-analysis warnings/deprecations not introduced by this fix (e.g., `on_event` deprecation, broad basedpyright warnings).

@@ -1,0 +1,43 @@
+VERDICT: PASS
+
+Baseline: cb7bf7a (origin/main)
+Range inspected: cb7bf7a..HEAD
+
+Commit mapping (allowed scope attribution)
+- 6b3f2c6 feat(kinds): persist and filter notes by kind -> kinds feature
+- ff2a20c feat(ui): add kind chips and social embeds -> social embeds
+- bdee605 feat(api): add urls-csv import and batch patch -> explicitly accepted extra endpoints
+- 34e31ee chore: update deps and misc refactors -> deps/tooling refactors
+
+Scope creep check
+- Unacknowledged scope creep: none found in commit-level attribution.
+
+Workspace hygiene checks
+- .sisyphus status: untracked only (`git status --porcelain=v1` shows `?? .sisyphus/`).
+- New dependencies: only `python-multipart>=0.0.22` added in `pyproject.toml`, with corresponding lockfile entry in `uv.lock`; rationale consistent with multipart/form upload support needed by urls-csv import endpoint.
+- Secret/credential scan on files changed in cb7bf7a..HEAD: no matches for `.env`/API-key/private-key/token/password leak patterns.
+
+Risks / follow-ups
+- `34e31ee` includes broad refactors alongside dependency change; if tighter traceability is needed, consider splitting dependency-only vs refactor-only commits in future.
+
+2026-02-23 (F4 deep re-check)
+VERDICT: PASS
+
+Baseline: cb7bf7a (origin/main)
+Range inspected: cb7bf7a..HEAD
+
+Commit mapping (allowed buckets only)
+- 6b3f2c6 feat(kinds): persist and filter notes by kind -> kinds feature.
+- ff2a20c feat(ui): add kind chips and social embeds -> social embeds.
+- bdee605 feat(api): add urls-csv import and batch patch -> accepted extra endpoints.
+- 34e31ee chore: update deps and misc refactors -> deps/tooling (plus internal refactors supporting accepted endpoint flow; no new product surface beyond approved buckets).
+- 690197b fix(api): qualify notes.id in note-kind counts filter -> kinds API/storage correctness bugfix (approved kinds bucket).
+
+Dependency/tooling re-confirmation
+- `pyproject.toml` adds only `python-multipart>=0.0.22`.
+- `uv.lock` delta is the corresponding lock update for `python-multipart==0.0.22`.
+- Rationale remains valid: multipart form upload handling needed by CSV import endpoint.
+
+Verification checks
+- `git status --porcelain=v1`: `?? .sisyphus/` only (no tracked workspace drift).
+- Secret-pattern quick scan on range-changed files (`token|password|key` + literal-assignment probe): no committed secret literals; `key` hits are structural/code identifiers and `instagram_password` usage reads runtime config only.

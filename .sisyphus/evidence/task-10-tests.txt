@@ -1,0 +1,856 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/home/wbsoft/omo/note-nomi/.venv/lib/python3.13/site-packages/pydantic/_internal/_known_annotated_metadata.py:106: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800ec071f0>
+  def expand_grouped_metadata(annotations: Iterable[Any]) -> Iterable[Any]:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/omo/note-nomi/app/main.py:33: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+/home/wbsoft/omo/note-nomi/.venv/lib/python3.13/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  return self.router.on_event(event_type)
+INFO httpx HTTP Request: GET http://testserver/ "HTTP/1.1 200 OK"
+.INFO httpx HTTP Request: POST http://testserver/api/v1/ingestions "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/ingestions/47 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/ingestions/47 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: POST http://testserver/api/v1/import/urls-csv?skip_duplicates=false "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/ingestions/48 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/notes "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: PATCH http://testserver/api/v1/notes/batch "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/notes?page=1&size=1&sort=created_desc "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/search?q=Sample&scope=full_content&page=1&size=1 "HTTP/1.1 200 OK"
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1120>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1990>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f07c0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e887c40>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1f30>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2020>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2110>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2200>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f22f0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f23e0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f24d0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f25c0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f26b0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f27a0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2890>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2980>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1210>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2a70>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2b60>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1b70>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1030>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f14e0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f16c0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3b50>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3c40>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3d30>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3e20>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3f10>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90040>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90130>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90220>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90310>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90400>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df904f0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df905e0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f0400>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f32e0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f33d0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3100>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f31f0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df906d0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df907c0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df908b0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df909a0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90a90>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90b80>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90c70>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90d60>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90e50>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90f40>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91030>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91120>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91210>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91300>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df913f0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df914e0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df915d0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f34c0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91e40>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91f30>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f3a60>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df924d0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93100>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df931f0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df932e0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df933d0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df934c0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df935b0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df936a0>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/functools.py:36: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93790>
+  def update_wrapper(wrapper,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+INFO httpx HTTP Request: GET http://testserver/api/v1/search?q=bulk-tag&scope=tags&page=1&size=10 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: POST http://testserver/api/v1/categories "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: PATCH http://testserver/api/v1/categories/185 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: POST http://testserver/api/v1/categories/merge "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/notes "HTTP/1.1 200 OK"
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e887c40>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2020>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f33d0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2a70>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f14e0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1120>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df918a0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92200>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92110>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92020>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df923e0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df922f0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93010>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92f20>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92e30>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92d40>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92c50>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91d50>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91b70>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df916c0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91a80>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df925c0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92980>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92a70>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92890>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df927a0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df935b0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df934c0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df933d0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df932e0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df931f0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93100>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df924d0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91f30>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91e40>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df915d0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df914e0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df913f0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91300>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91210>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91120>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91030>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90f40>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90e50>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90d60>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90c70>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90b80>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90a90>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df909a0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df908b0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df907c0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df906d0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df905e0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df904f0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90400>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90310>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90220>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90130>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90040>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93970>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93a60>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93b50>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93c40>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93d30>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93e20>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93f10>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000040>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000130>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000220>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000310>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000400>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0004f0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0005e0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0006d0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0007c0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/urllib/parse.py:129: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0008b0>
+  if arg and isinstance(arg, str) != str_input:
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+INFO httpx HTTP Request: POST http://testserver/api/v1/exports/notebooklm "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/exports/exp_1771818193/download "HTTP/1.1 200 OK"
+.INFO httpx HTTP Request: POST http://testserver/api/v1/import/kakaotalk?skip_duplicates=false "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: POST http://testserver/api/v1/ingestions "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/ingestions/49 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/ingestions/49 "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/note-kinds "HTTP/1.1 200 OK"
+.INFO httpx HTTP Request: POST http://testserver/api/v1/import/kakaotalk?skip_duplicates=false "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/notes?kind=youtube "HTTP/1.1 200 OK"
+INFO httpx HTTP Request: GET http://testserver/api/v1/notes?kind=not_a_kind "HTTP/1.1 400 Bad Request"
+.............../home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91c60>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93880>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1030>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0009a0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93f10>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93e20>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93d30>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93c40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93b50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93a60>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93970>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90040>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90130>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90220>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90310>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90400>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df904f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df905e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df906d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df907c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df908b0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df909a0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90a90>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90b80>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90c70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90d60>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90e50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df90f40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91030>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91120>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91210>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91300>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df913f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df914e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df915d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91e40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91f30>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df924d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df93100>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df931f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df932e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df933d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df934c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df935b0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df927a0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92890>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92a70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92980>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df925c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91a80>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df916c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91b70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df91d50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92c50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92d40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92e30>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800df92f20>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f31f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2a70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f2020>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8862f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f24d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0006d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0005e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0004f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000400>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000310>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000220>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000130>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f33d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f14e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000c70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f16c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e000f40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f0400>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001210>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001300>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0013f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0014e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0015d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0016c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0017b0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0018a0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001990>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001a80>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001b70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001c60>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001d50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e001e40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0022f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0024d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0027a0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002890>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002980>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e8f1120>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0025c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0026b0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002a70>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002b60>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002c50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002d40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002e30>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e002f20>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003010>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003100>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0031f0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0032e0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0033d0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0034c0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0035b0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e0036a0>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003790>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003880>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003970>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003a60>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003b50>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003c40>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003d30>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003f10>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800e003e20>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/wbsoft/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:687: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x78800ce50040>
+  raise AttributeError(name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.INFO app.analysis_worker Instagram URL requested: https://www.instagram.com/p/ABC123/
+WARNING app.analysis_worker Instagram: fetch_failed for https://www.instagram.com/p/ABC123/ (fetch_failed)
+.INFO app.analysis_worker Instagram URL requested: https://www.instagram.com/p/xyz/
+INFO app.analysis_worker Instagram: using HTTP + og: meta fallback
+.INFO app.analysis_worker Instagram URL requested: https://www.instagram.com/p/abc123/
+INFO app.analysis_worker Instagram: trying Playwright browser fetch
+INFO app.analysis_worker Instagram: Playwright fetch ok, content length=54
+......
+----------------------------------------------------------------------
+Ran 27 tests in 3.281s
+
+OK
