@@ -47,6 +47,31 @@
       .tag-edit-row .tag .tag-remove:hover { color: #dc3545; }
       .tag-add-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
       .tag-add-form input { flex: 1; min-width: 100px; }
+      .social-embed-panel { margin-top: 16px; border-top: 1px solid #e6e8f2; padding-top: 16px; }
+      .social-embed-panel h3 { margin: 0 0 10px; font-size: 1rem; }
+      .embed-section + .embed-section { margin-top: 16px; }
+      .embed-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+      .embed-controls { display: flex; gap: 6px; }
+      .embed-controls button { padding: 6px 10px; font-size: 0.8rem; }
+      .embed-track {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: 2px;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+        padding-bottom: 6px;
+      }
+      .embed-item {
+        flex: 0 0 min(100%, 560px);
+        scroll-snap-align: start;
+        border: 1px solid #e6e8f2;
+        border-radius: 10px;
+        background: #fafbff;
+        padding: 10px;
+      }
+      .embed-link { margin-top: 8px; font-size: 0.8rem; word-break: break-all; }
     </style>
   </head>
   <body>
@@ -55,7 +80,209 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="text/babel">
-      const { useEffect, useState } = React;
+      const { useEffect, useMemo, useRef, useState } = React;
+
+      const INSTAGRAM_EMBED_SCRIPT = "https://www.instagram.com/embed.js";
+      const THREADS_EMBED_SCRIPT = "https://www.threads.net/embed.js";
+      const KIND_FILTERS = [
+        { id: "", label: "전체" },
+        { id: "plain_text", label: "평문" },
+        { id: "youtube", label: "유튜브" },
+        { id: "instagram_post", label: "인스타" },
+        { id: "instagram_reel", label: "릴스" },
+        { id: "threads", label: "스레드" },
+        { id: "other_link", label: "기타" },
+      ];
+      const KIND_LABEL_MAP = {
+        plain_text: "평문",
+        youtube: "유튜브",
+        instagram_post: "인스타",
+        instagram_reel: "릴스",
+        threads: "스레드",
+        other_link: "기타",
+      };
+
+      const scriptPromiseMap = new Map();
+
+      function ensureScript(src) {
+        if (scriptPromiseMap.has(src)) return scriptPromiseMap.get(src);
+        const promise = new Promise((resolve, reject) => {
+          const existing = document.querySelector(`script[data-embed-script="${src}"]`);
+          if (existing) {
+            if (existing.dataset.ready === "true") {
+              resolve();
+              return;
+            }
+            existing.addEventListener("load", () => resolve(), { once: true });
+            existing.addEventListener("error", () => reject(new Error("스크립트를 불러오지 못했습니다.")), { once: true });
+            return;
+          }
+          const script = document.createElement("script");
+          script.async = true;
+          script.src = src;
+          script.dataset.embedScript = src;
+          script.addEventListener("load", () => {
+            script.dataset.ready = "true";
+            resolve();
+          }, { once: true });
+          script.addEventListener("error", () => reject(new Error("스크립트를 불러오지 못했습니다.")), { once: true });
+          document.body.appendChild(script);
+        });
+        scriptPromiseMap.set(src, promise);
+        return promise;
+      }
+
+      function normalizeUrl(raw) {
+        if (!raw || typeof raw !== "string") return null;
+        try {
+          const url = new URL(raw.trim());
+          return url.toString();
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function detectSocialType(raw) {
+        const normalized = normalizeUrl(raw);
+        if (!normalized) return null;
+        const parsed = new URL(normalized);
+        const host = parsed.hostname.toLowerCase();
+        if (host.endsWith("instagram.com") || host === "instagr.am") {
+          if (parsed.pathname.includes("/p/") || parsed.pathname.includes("/reel/") || parsed.pathname.includes("/tv/")) {
+            return { type: "instagram", url: normalized };
+          }
+          return null;
+        }
+        if (host.endsWith("threads.net")) {
+          if (parsed.pathname.includes("/post/")) {
+            return { type: "threads", url: normalized };
+          }
+        }
+        return null;
+      }
+
+      function extractSocialLinks(note) {
+        const sources = [note?.sourceUrl, note?.contentFull, note?.summaryLong, note?.summaryShort].filter(Boolean).join("\n");
+        const matches = sources.match(/https?:\/\/[^\s"'<>]+/g) || [];
+        const unique = new Set();
+        if (note?.sourceUrl) unique.add(note.sourceUrl);
+        matches.forEach((m) => unique.add(m));
+
+        const instagram = [];
+        const threads = [];
+
+        Array.from(unique).forEach((url) => {
+          const parsed = detectSocialType(url);
+          if (!parsed) return;
+          if (parsed.type === "instagram" && !instagram.includes(parsed.url)) instagram.push(parsed.url);
+          if (parsed.type === "threads" && !threads.includes(parsed.url)) threads.push(parsed.url);
+        });
+
+        return { instagram, threads };
+      }
+
+      function SwipeableEmbedStrip({ title, links, kind, trackRef }) {
+        if (!links.length) return null;
+
+        const scrollTrack = (direction) => {
+          const node = trackRef.current;
+          if (!node) return;
+          const amount = Math.max(node.clientWidth * 0.9, 280);
+          node.scrollBy({ left: direction * amount, behavior: "smooth" });
+        };
+
+        return (
+          <section className="embed-section">
+            <div className="embed-header">
+              <h3>{title}</h3>
+              {links.length > 1 ? (
+                <div className="embed-controls">
+                  <button type="button" className="btn-outline" onClick={() => scrollTrack(-1)}>이전</button>
+                  <button type="button" className="btn-outline" onClick={() => scrollTrack(1)}>다음</button>
+                </div>
+              ) : null}
+            </div>
+            <div className="embed-track" ref={trackRef} aria-label={title}>
+              {links.map((url) => (
+                <article className="embed-item" key={`${kind}-${url}`}>
+                  {kind === "instagram" ? (
+                    <blockquote className="instagram-media" data-instgrm-permalink={url} data-instgrm-version="14" style={{ margin: 0, minWidth: 0 }}>
+                      <a href={url} target="_blank" rel="noopener noreferrer">Instagram 콘텐츠 보기</a>
+                    </blockquote>
+                  ) : (
+                    <blockquote className="threads-embed" data-threads-post-url={url} style={{ margin: 0, minWidth: 0 }}>
+                      <a href={url} target="_blank" rel="noopener noreferrer">Threads 콘텐츠 보기</a>
+                    </blockquote>
+                  )}
+                  <div className="embed-link">
+                    <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      }
+
+      function SocialEmbedViewer({ note }) {
+        const { instagram, threads } = useMemo(() => extractSocialLinks(note), [note]);
+        const instagramTrackRef = useRef(null);
+        const threadsTrackRef = useRef(null);
+
+        const processThreadsEmbeds = () => {
+          const candidates = [
+            window?.threads?.process,
+            window?.threads?.Embeds?.process,
+            window?.__threadsEmbed?.process,
+            window?.__threadsEmbed?.load,
+          ];
+          for (const fn of candidates) {
+            if (typeof fn === "function") {
+              fn();
+              return true;
+            }
+          }
+          return false;
+        };
+
+        useEffect(() => {
+          if (!instagram.length) return;
+          ensureScript(INSTAGRAM_EMBED_SCRIPT)
+            .then(() => {
+              if (window.instgrm && window.instgrm.Embeds && typeof window.instgrm.Embeds.process === "function") {
+                window.instgrm.Embeds.process();
+              }
+            })
+            .catch(() => {});
+        }, [instagram]);
+
+        useEffect(() => {
+          if (!threads.length) return;
+          ensureScript(THREADS_EMBED_SCRIPT)
+            .then(() => {
+              if (processThreadsEmbeds()) return;
+              const refreshScript = document.createElement("script");
+              refreshScript.async = true;
+              refreshScript.src = THREADS_EMBED_SCRIPT;
+              const cleanup = () => refreshScript.remove();
+              refreshScript.addEventListener("load", cleanup, { once: true });
+              refreshScript.addEventListener("error", cleanup, { once: true });
+              document.body.appendChild(refreshScript);
+            })
+            .catch(() => {});
+        }, [threads]);
+
+        if (!instagram.length && !threads.length) return null;
+
+        return (
+          <section className="social-embed-panel">
+            <h2 style={{ marginTop: 0 }}>연결된 소셜 페이지</h2>
+            <p className="muted" style={{ marginTop: 0 }}>모바일에서는 좌우 스와이프로 카드/스레드를 넘길 수 있습니다.</p>
+            <SwipeableEmbedStrip title="Instagram 카드" links={instagram} kind="instagram" trackRef={instagramTrackRef} />
+            <SwipeableEmbedStrip title="Threads 스레드" links={threads} kind="threads" trackRef={threadsTrackRef} />
+          </section>
+        );
+      }
 
       function parseRoute() {
         const hash = (window.location.hash || "#/").slice(1);
@@ -65,6 +292,10 @@
           return { page: "note", noteId: isNaN(id) ? null : id };
         }
         return { page: "list", noteId: null };
+      }
+
+      function getKindLabel(kindId) {
+        return KIND_LABEL_MAP[kindId] || kindId;
       }
 
       function NoteFullView({ noteId, onDeleted }) {
@@ -250,6 +481,7 @@
                   ))}
                 </div>
                 <div className="tab-body">{activeContent}</div>
+                <SocialEmbedViewer note={note} />
               </div>
             </div>
           </div>
@@ -262,6 +494,9 @@
         const [notes, setNotes] = useState([]);
         const [tags, setTags] = useState([]);
         const [selectedTag, setSelectedTag] = useState("");
+        const [selectedKind, setSelectedKind] = useState("");
+        const [kindCounts, setKindCounts] = useState({});
+        const [totalKindNotes, setTotalKindNotes] = useState(null);
         const [loading, setLoading] = useState(false);
         const [submitting, setSubmitting] = useState(false);
         const [message, setMessage] = useState("");
@@ -281,6 +516,7 @@
           try {
             const params = new URLSearchParams({ page: "1", size: "200" });
             if (selectedTag) params.set("tag", selectedTag);
+            if (selectedKind) params.set("kind", selectedKind);
             const response = await fetch("/api/v1/notes?" + params.toString());
             const data = await response.json();
             setNotes(data.items || []);
@@ -301,12 +537,34 @@
           }
         };
 
+        const fetchNoteKinds = async () => {
+          try {
+            const params = new URLSearchParams();
+            if (selectedTag) params.set("tag", selectedTag);
+            const query = params.toString();
+            const response = await fetch("/api/v1/note-kinds" + (query ? `?${query}` : ""));
+            if (!response.ok) throw new Error("kind_count_fetch_failed");
+            const data = await response.json();
+            const nextCounts = {};
+            (data.items || []).forEach((item) => {
+              if (!item || !item.kind) return;
+              nextCounts[item.kind] = item.count || 0;
+            });
+            setKindCounts(nextCounts);
+            setTotalKindNotes(typeof data.totalNotes === "number" ? data.totalNotes : null);
+          } catch (_) {
+            setKindCounts({});
+            setTotalKindNotes(null);
+          }
+        };
+
         useEffect(() => {
           if (route.page === "list") {
             fetchNotes();
             fetchTags();
+            fetchNoteKinds();
           }
-        }, [route.page, selectedTag]);
+        }, [route.page, selectedTag, selectedKind]);
 
         const onSubmit = async (event) => {
           event.preventDefault();
@@ -435,6 +693,24 @@
                 </button>
               </div>
               <div className="tag-filter">
+                <span className="muted">유형별 보기:</span>
+                {KIND_FILTERS.map((kind) => {
+                  const isAll = kind.id === "";
+                  const count = isAll ? totalKindNotes : kindCounts[kind.id];
+                  const hasCount = typeof count === "number";
+                  return (
+                    <span
+                      className={"tag" + (selectedKind === kind.id ? " active" : "")}
+                      key={kind.id || "all"}
+                      onClick={() => setSelectedKind(kind.id)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedKind(kind.id); } }}
+                    >{kind.label}{hasCount ? ` (${count})` : ""}</span>
+                  );
+                })}
+              </div>
+              <div className="tag-filter">
                 <span className="muted">태그별 보기:</span>
                 <span
                   className={"tag" + (selectedTag === "" ? " active" : "")}
@@ -455,8 +731,9 @@
                 ))}
                 {tags.length === 0 && !loading ? <span className="muted">태그 없음</span> : null}
               </div>
-              {loading ? <p>불러오는 중...</p> : notes.length === 0 ? <p className="muted">{selectedTag ? "해당 태그 메모가 없습니다." : "아직 수집된 노트가 없습니다."}</p> : notes.map((note) => {
+              {loading ? <p>불러오는 중...</p> : notes.length === 0 ? <p className="muted">{selectedTag || selectedKind ? "해당 조건의 메모가 없습니다." : "아직 수집된 노트가 없습니다."}</p> : notes.map((note) => {
                 const noteTags = [...(note.tags || []), ...(note.hashtags || [])];
+                const noteKinds = (note.kinds || []).filter(Boolean);
                 return (
                   <article
                     className="note"
@@ -470,6 +747,7 @@
                     <p className="muted">{note.sourceUrl}</p>
                     <p>{note.summaryShort || "요약이 아직 없습니다."}</p>
                     <div className="tags">
+                      {noteKinds.map((kind) => <span className="tag" key={`${note.id}-kind-${kind}`}>{getKindLabel(kind)}</span>)}
                       {note.category?.name ? <span className="tag">#{note.category.name}</span> : null}
                       {noteTags.map((tag) => <span className="tag" key={`${note.id}-${tag.type}-${tag.name}`}>#{tag.name}</span>)}
                     </div>
