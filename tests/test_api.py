@@ -45,7 +45,7 @@ class APITests(unittest.TestCase):
         imported_note_ids = imported.json()["noteIds"]
         self.assertGreaterEqual(len(imported_note_ids), 1)
 
-        filtered = client.get("/api/v1/notes", params={"kind": "youtube"})
+        filtered = client.get("/api/v1/notes", params={"kind": "youtube", "size": 100})
         self.assertEqual(filtered.status_code, 200)
         body = filtered.json()
         self.assertGreaterEqual(body["total"], 1)
@@ -122,6 +122,38 @@ class APITests(unittest.TestCase):
             self.assertIn(kind, counts)
         self.assertGreaterEqual(counts["youtube"], 1)
         self.assertGreaterEqual(counts["other_link"], 1)
+
+    @unittest.skipUnless(
+        __import__("importlib").util.find_spec("fastapi") is not None,
+        "fastapi unavailable",
+    )
+    def test_note_kinds_counts_endpoint_with_q_filter(self) -> None:
+        TestClient = import_module("fastapi.testclient").TestClient
+        from app.main import app
+
+        client = TestClient(app)
+
+        csv_payload = (
+            "Date,User,Message\n"
+            "2026-02-23 12:34:56,me,watch this https://youtu.be/dQw4w9WgXcQ\n"
+        ).encode("utf-8")
+        imported = client.post(
+            "/api/v1/import/kakaotalk?skip_duplicates=false",
+            files={"file": ("kakaotalk.csv", csv_payload, "text/csv")},
+        )
+        self.assertEqual(imported.status_code, 200)
+        self.assertGreaterEqual(len(imported.json()["noteIds"]), 1)
+
+        counts_resp = client.get("/api/v1/note-kinds", params={"q": "watch"})
+        self.assertEqual(counts_resp.status_code, 200)
+
+        body = counts_resp.json()
+        self.assertIn("items", body)
+        self.assertIsInstance(body["items"], list)
+        self.assertGreater(len(body["items"]), 0)
+        for item in body["items"]:
+            self.assertIn("kind", item)
+            self.assertIn("count", item)
 
     @unittest.skipUnless(
         __import__("importlib").util.find_spec("fastapi") is not None,

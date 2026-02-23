@@ -222,18 +222,18 @@ class SQLiteStore:
                 elif q_scope == "title_summary":
                     fts_query = f"(ai_title : {token_query} OR summary_short : {token_query} OR summary_long : {token_query})"
                     clauses.append(
-                        "id IN (SELECT rowid FROM notes_fts WHERE notes_fts MATCH ?)"
+                        "notes.id IN (SELECT rowid FROM notes_fts WHERE notes_fts MATCH ?)"
                     )
                     params.append(fts_query)
                 elif q_scope == "full_content":
                     fts_query = f"content_full : {token_query}"
                     clauses.append(
-                        "id IN (SELECT rowid FROM notes_fts WHERE notes_fts MATCH ?)"
+                        "notes.id IN (SELECT rowid FROM notes_fts WHERE notes_fts MATCH ?)"
                     )
                     params.append(fts_query)
                 else:
                     clauses.append(
-                        "id IN (SELECT rowid FROM notes_fts WHERE notes_fts MATCH ? UNION SELECT id FROM notes WHERE tags_json LIKE ? OR hashtags_json LIKE ?)"
+                        "notes.id IN (SELECT rowid FROM notes_fts WHERE notes_fts MATCH ? UNION SELECT id FROM notes WHERE tags_json LIKE ? OR hashtags_json LIKE ?)"
                     )
                     params.extend([token_query, f"%{q}%", f"%{q}%"])
 
